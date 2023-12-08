@@ -4,22 +4,17 @@ interface errorHandlerProps {
     err: any;
     req: Request;
     res: Response;
-    next: NextFunction
+    next: NextFunction;
 }
 
-const errorHandler = (
-    {err,
-    req,
-    res,
-    next}: errorHandlerProps
-) => {
-    console.log(err.stack);
+const errorHandler = ({ err, req, res, next }: errorHandlerProps) => {
+    console.log(err?.stack);
 
     console.log(err);
 
-    res.status(err.statusCode || 500).json({
+    res.status(err?.statusCode || 500).json({
         success: false,
-        error: err.message,
+        error: err?.message,
     });
 };
 

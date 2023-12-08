@@ -1,15 +1,5 @@
 import mongoose from "mongoose";
-
-interface IProduct extends mongoose.Document {
-    name: string;
-    img: string;
-    price: number;
-    desc: string;
-    category: string;
-    created_at: Date;
-    updated_at: Date | undefined | null;
-    is_deleted: boolean;
-}
+import { IProduct } from "../types/product";
 
 const ProductSchema = new mongoose.Schema<IProduct>({
     name: {
@@ -17,36 +7,36 @@ const ProductSchema = new mongoose.Schema<IProduct>({
         required: [true, "Insert your product name..."],
         unique: true,
         trim: true,
-        max: [250, "Max length of product name is 250..."]
+        max: [250, "Max length of product name is 250..."],
     },
     img: {
         type: String,
-        default: "no_photo.jpg"
+        default: "no_photo.jpg",
     },
     price: {
         type: Number,
-        required: [true, "Insert price of the product..."]
+        required: [true, "Insert price of the product..."],
     },
     desc: {
         type: String,
-        required: [true, "Description of the product..."]
+        required: [true, "Description of the product..."],
     },
     category: {
-        type: String,
-        ref: "Product",
-        required: [true, "Insert category of the product..."]
+        type: mongoose.Schema.ObjectId,
+        ref: "Category",
+        required: [true, "Insert category of the product..."],
     },
     created_at: {
         type: Date,
-        default: Date.now()
+        default: Date.now(),
     },
     updated_at: {
         type: Date,
     },
     is_deleted: {
         type: Boolean,
-        default: false
-    }
-})
+        default: false,
+    },
+});
 
-export default mongoose.model("Product", ProductSchema)
+export default mongoose.model("Product", ProductSchema);
