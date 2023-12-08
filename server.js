@@ -12,8 +12,6 @@ const product_1 = __importDefault(require("./routes/product"));
 const category_1 = __importDefault(require("./routes/category"));
 const adminUser_1 = __importDefault(require("./routes/adminUser"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
-const compression_1 = __importDefault(require("compression"));
-const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 dotenv_1.default.config({
     path: "./config/config.env",
 });
@@ -21,8 +19,8 @@ dotenv_1.default.config({
 const app = (0, express_1.default)();
 const port = process.env.PORT;
 app.use((0, express_fileupload_1.default)());
-app.use((0, compression_1.default)());
-app.use(express_rate_limit_1.default);
+// app.use(compression());
+// app.use(limiter);
 app.use(express_1.default.static("public"));
 app.use("/upload", express_1.default.static("upload"));
 app.get("/", (req, res) => {

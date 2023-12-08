@@ -21,8 +21,8 @@ const app = express();
 const port = process.env.PORT;
 
 app.use(fileUpload());
-app.use(compression());
-app.use(limiter);
+// app.use(compression());
+// app.use(limiter);
 
 app.use(express.static("public"));
 app.use("/upload", express.static("upload"));
