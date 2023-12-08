@@ -27,6 +27,11 @@ app.use(limiter);
 app.use(express.static("public"));
 app.use("/upload", express.static("upload"));
 
+app.use("/", function () {
+    return {
+        success: true,
+    };
+});
 app.use("/api/v1/products", cors(), productRouter);
 app.use("/api/v1/categories", cors(), categoryRouter);
 app.use("/api/v1/admin", cors(), adminUserRouter);

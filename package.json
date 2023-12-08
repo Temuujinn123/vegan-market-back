@@ -2,10 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.ts",
+  "main": "/app/server.ts",
   "scripts": {
-    "start": "NODE_ENV=production node server",
-    "dev": "nodemon server",
+    "start": "NODE_ENV=production node /app/server",
+    "dev": "nodemon /app/server",
     "tsc": "tsc"
   },
   "author": "",
