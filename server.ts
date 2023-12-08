@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db";
 import cors from "cors";
@@ -27,11 +27,10 @@ app.use(limiter);
 app.use(express.static("public"));
 app.use("/upload", express.static("upload"));
 
-app.use("/", function () {
-    return {
-        success: true,
-    };
+app.get("/", (req: Request, res: Response) => {
+    res.status(200).json("Welcome!");
 });
+
 app.use("/api/v1/products", cors(), productRouter);
 app.use("/api/v1/categories", cors(), categoryRouter);
 app.use("/api/v1/admin", cors(), adminUserRouter);
