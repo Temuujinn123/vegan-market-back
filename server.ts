@@ -9,6 +9,7 @@ import adminUserRouter from "./routes/adminUser";
 import fileUpload from "express-fileupload";
 import compression from "compression";
 import limiter from "express-rate-limit";
+import userRouter from "./routes/user";
 
 dotenv.config({
     path: "./config/config.env",
@@ -24,6 +25,16 @@ app.use(fileUpload());
 // app.use(compression());
 // app.use(limiter);
 
+app.use(
+    cors({
+        origin: [
+            "http://localhost:3000",
+            "https://vegan-market-front.vercel.app/",
+        ],
+        optionsSuccessStatus: 200,
+    })
+);
+
 app.use(express.static("public"));
 app.use("/upload", express.static("upload"));
 
@@ -34,6 +45,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api/v1/products", cors(), productRouter);
 app.use("/api/v1/categories", cors(), categoryRouter);
 app.use("/api/v1/admin", cors(), adminUserRouter);
+app.use("/api/v1/user", cors(), userRouter);
 app.use(errorHandler);
 
 const server = app.listen(port, () => {

@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { IAdminUser } from "../types/adminUser";
+import { IUser } from "../types/user";
 
-const UserSchema = new mongoose.Schema<IAdminUser>({
+const UserSchema = new mongoose.Schema<IUser>({
     name: {
         type: String,
         required: [true, "Please insert your name."],
@@ -16,6 +16,10 @@ const UserSchema = new mongoose.Schema<IAdminUser>({
             /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
             "Email is incorrect",
         ],
+    },
+    phone_number: {
+        type: Number,
+        required: [true, "Please insert your phone number."],
     },
     password: {
         type: String,

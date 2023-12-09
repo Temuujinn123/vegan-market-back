@@ -20,6 +20,10 @@ const UserSchema = new mongoose_1.default.Schema({
             "Email is incorrect",
         ],
     },
+    phone_number: {
+        type: Number,
+        required: [true, "Please insert your phone number."],
+    },
     password: {
         type: String,
         minLength: 4,
