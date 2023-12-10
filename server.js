@@ -24,7 +24,7 @@ app.use((0, express_fileupload_1.default)());
 // app.use(limiter);
 app.use((0, cors_1.default)({
     origin: [
-        "http://localhost:3000/",
+        "http://localhost:3000",
         "https://vegan-market-front.vercel.app/",
     ],
     optionsSuccessStatus: 200,

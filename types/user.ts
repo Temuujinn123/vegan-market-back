@@ -1,4 +1,6 @@
-export interface IUser {
+import mongoose from "mongoose";
+
+export interface IUser extends mongoose.Document {
     name: string;
     email: string;
     phone_number: number;

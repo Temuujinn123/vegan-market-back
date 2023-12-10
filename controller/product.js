@@ -4,13 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadProductPhoto = exports.deleteProduct = exports.getProduct = exports.updateProduct = exports.createProduct = exports.lastProducts = exports.getCategoryProducts = void 0;
-const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const paginate_1 = __importDefault(require("../utils/paginate"));
 const Product_1 = __importDefault(require("../models/Product"));
 const myError_1 = __importDefault(require("../utils/myError"));
 const path_1 = __importDefault(require("path"));
 const Category_1 = __importDefault(require("../models/Category"));
-exports.getCategoryProducts = (0, express_async_handler_1.default)(async (req, res, next) => {
+const asyncHandler_1 = __importDefault(require("../middleware/asyncHandler"));
+exports.getCategoryProducts = (0, asyncHandler_1.default)(async (req, res, next) => {
     var _a;
     const page = req.query.page || 1;
     const limit = req.query.limit || 10;
@@ -56,7 +56,7 @@ exports.getCategoryProducts = (0, express_async_handler_1.default)(async (req, r
         pagination,
     });
 });
-exports.lastProducts = (0, express_async_handler_1.default)(async (req, res, next) => {
+exports.lastProducts = (0, asyncHandler_1.default)(async (req, res, next) => {
     const products = await Product_1.default.find()
         .sort({ created_at: -1 })
         .limit(3)
@@ -69,7 +69,7 @@ exports.lastProducts = (0, express_async_handler_1.default)(async (req, res, nex
         data: products,
     });
 });
-exports.createProduct = (0, express_async_handler_1.default)(async (req, res, next) => {
+exports.createProduct = (0, asyncHandler_1.default)(async (req, res, next) => {
     const category = await Category_1.default.findById(req.body.category);
     if (!category)
         throw new myError_1.default(req.body.product + " is not found...", 400);
@@ -79,7 +79,7 @@ exports.createProduct = (0, express_async_handler_1.default)(async (req, res, ne
         data: product,
     });
 });
-exports.updateProduct = (0, express_async_handler_1.default)(async (req, res, next) => {
+exports.updateProduct = (0, asyncHandler_1.default)(async (req, res, next) => {
     const product = await Product_1.default.findByIdAndUpdate(req.params.id, Object.assign(Object.assign({}, req.body), { updated_at: Date.now() }), {
         new: true,
         runValidators: true,
@@ -91,7 +91,7 @@ exports.updateProduct = (0, express_async_handler_1.default)(async (req, res, ne
         data: product,
     });
 });
-exports.getProduct = (0, express_async_handler_1.default)(async (req, res, next) => {
+exports.getProduct = (0, asyncHandler_1.default)(async (req, res, next) => {
     const product = await Product_1.default.findById(req.params.id).populate({
         path: "category",
     });
@@ -102,7 +102,7 @@ exports.getProduct = (0, express_async_handler_1.default)(async (req, res, next)
         data: product,
     });
 });
-exports.deleteProduct = (0, express_async_handler_1.default)(async (req, res, next) => {
+exports.deleteProduct = (0, asyncHandler_1.default)(async (req, res, next) => {
     const product = await Product_1.default.findByIdAndUpdate(req.params.id, { is_deleted: true, updated_at: Date.now() });
     if (!product)
         throw new myError_1.default(req.params.id + " is not found...", 404);
@@ -111,7 +111,7 @@ exports.deleteProduct = (0, express_async_handler_1.default)(async (req, res, ne
         data: product,
     });
 });
-exports.uploadProductPhoto = (0, express_async_handler_1.default)(async (req, res, next) => {
+exports.uploadProductPhoto = (0, asyncHandler_1.default)(async (req, res, next) => {
     var _a;
     const product = await Product_1.default.findById(req.params.id);
     if (!product)

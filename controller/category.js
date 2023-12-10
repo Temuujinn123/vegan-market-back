@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCategory = exports.getCategory = exports.updateCategory = exports.createCategory = exports.getCategories = void 0;
-const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const paginate_1 = __importDefault(require("../utils/paginate"));
 const myError_1 = __importDefault(require("../utils/myError"));
 const Category_1 = __importDefault(require("../models/Category"));
-exports.getCategories = (0, express_async_handler_1.default)(async (req, res, next) => {
+const asyncHandler_1 = __importDefault(require("../middleware/asyncHandler"));
+exports.getCategories = (0, asyncHandler_1.default)(async (req, res, next) => {
     var _a;
     const page = req.query.page || 1;
     let limit = req.query.limit || 10;
@@ -33,14 +33,14 @@ exports.getCategories = (0, express_async_handler_1.default)(async (req, res, ne
         pagination,
     });
 });
-exports.createCategory = (0, express_async_handler_1.default)(async (req, res, next) => {
+exports.createCategory = (0, asyncHandler_1.default)(async (req, res, next) => {
     const category = await Category_1.default.create(req.body);
     res.status(200).json({
         success: true,
         data: category,
     });
 });
-exports.updateCategory = (0, express_async_handler_1.default)(async (req, res, next) => {
+exports.updateCategory = (0, asyncHandler_1.default)(async (req, res, next) => {
     const category = await Category_1.default.findByIdAndUpdate(req.params.id, Object.assign(Object.assign({}, req.body), { updated_at: Date.now() }), {
         new: true,
         runValidators: true,
@@ -52,7 +52,7 @@ exports.updateCategory = (0, express_async_handler_1.default)(async (req, res, n
         data: category,
     });
 });
-exports.getCategory = (0, express_async_handler_1.default)(async (req, res, next) => {
+exports.getCategory = (0, asyncHandler_1.default)(async (req, res, next) => {
     const category = await Category_1.default.findById(req.params.id);
     if (!category)
         throw new myError_1.default(req.params.id + " is not found...", 400);
@@ -61,7 +61,7 @@ exports.getCategory = (0, express_async_handler_1.default)(async (req, res, next
         data: category,
     });
 });
-exports.deleteCategory = (0, express_async_handler_1.default)(async (req, res, next) => {
+exports.deleteCategory = (0, asyncHandler_1.default)(async (req, res, next) => {
     const category = await Category_1.default.findByIdAndUpdate(req.params.id, { is_deleted: true, updated_at: Date.now() });
     if (!category)
         throw new myError_1.default(req.params.id + " is not found...", 404);

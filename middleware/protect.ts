@@ -1,9 +1,9 @@
-import expressAsyncHandler from "express-async-handler";
 import MyError from "../utils/myError";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import asyncHandler from "./asyncHandler";
 
-export const protect = expressAsyncHandler(
+export const protect = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         if (!req.headers.authorization) {
             throw new MyError("Please login first.", 401);

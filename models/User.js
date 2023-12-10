@@ -30,8 +30,18 @@ const UserSchema = new mongoose_1.default.Schema({
         required: [true, "Please insert your password."],
         select: false,
     },
-    resetPasswordToken: String,
-    resetPasswordExpire: Date,
+    resetPasswordToken: {
+        type: String,
+        required: false,
+        select: false,
+        default: "",
+    },
+    resetPasswordExpire: {
+        type: Date,
+        required: false,
+        select: false,
+        default: Date.now(),
+    },
     created_at: {
         type: Date,
         default: Date.now(),

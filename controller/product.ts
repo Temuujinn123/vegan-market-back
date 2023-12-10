@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import expressAsyncHandler from "express-async-handler";
 import Pagintate from "../utils/paginate";
 import { IProduct } from "../types/product";
 import Product from "../models/Product";
@@ -7,8 +6,9 @@ import MyError from "../utils/myError";
 import path from "path";
 import Category from "../models/Category";
 import { ICategory } from "../types/category";
+import asyncHandler from "../middleware/asyncHandler";
 
-export const getCategoryProducts = expressAsyncHandler(
+export const getCategoryProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const page = req.query.page || 1;
         const limit = req.query.limit || 10;
@@ -73,7 +73,7 @@ export const getCategoryProducts = expressAsyncHandler(
     }
 );
 
-export const lastProducts = expressAsyncHandler(
+export const lastProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const products: IProduct[] | null = await Product.find()
             .sort({ created_at: -1 })
@@ -90,7 +90,7 @@ export const lastProducts = expressAsyncHandler(
     }
 );
 
-export const createProduct = expressAsyncHandler(
+export const createProduct = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const category: ICategory | null = await Category.findById(
             req.body.category
@@ -108,7 +108,7 @@ export const createProduct = expressAsyncHandler(
     }
 );
 
-export const updateProduct = expressAsyncHandler(
+export const updateProduct = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const product: IProduct | null = await Product.findByIdAndUpdate(
             req.params.id,
@@ -129,7 +129,7 @@ export const updateProduct = expressAsyncHandler(
     }
 );
 
-export const getProduct = expressAsyncHandler(
+export const getProduct = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const product: IProduct | null = await Product.findById(
             req.params.id
@@ -147,7 +147,7 @@ export const getProduct = expressAsyncHandler(
     }
 );
 
-export const deleteProduct = expressAsyncHandler(
+export const deleteProduct = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const product: IProduct | null = await Product.findByIdAndUpdate(
             req.params.id,
@@ -164,7 +164,7 @@ export const deleteProduct = expressAsyncHandler(
     }
 );
 
-export const uploadProductPhoto = expressAsyncHandler(
+export const uploadProductPhoto = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const product: IProduct | null = await Product.findById(req.params.id);
 

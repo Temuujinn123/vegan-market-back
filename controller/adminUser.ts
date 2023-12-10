@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import expressAsyncHandler from "express-async-handler";
 import MyError from "../utils/myError";
 import { IAdminUser } from "../types/adminUser";
 import AdminUser from "../models/AdminUser";
+import asyncHandler from "../middleware/asyncHandler";
 
-export const register = expressAsyncHandler(
+export const register = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const adminUser: IAdminUser = await AdminUser.create(req.body);
 
@@ -18,7 +18,7 @@ export const register = expressAsyncHandler(
     }
 );
 
-export const login = expressAsyncHandler(
+export const login = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { email, password } = req.body;
 

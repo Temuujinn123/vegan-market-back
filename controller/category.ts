@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import expressAsyncHandler from "express-async-handler";
 import Pagintate from "../utils/paginate";
 import MyError from "../utils/myError";
 import Category from "../models/Category";
 import { ICategory } from "../types/category";
+import asyncHandler from "../middleware/asyncHandler";
 
-export const getCategories = expressAsyncHandler(
+export const getCategories = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const page = req.query.page || 1;
         let limit = req.query.limit || 10;
@@ -46,7 +46,7 @@ export const getCategories = expressAsyncHandler(
     }
 );
 
-export const createCategory = expressAsyncHandler(
+export const createCategory = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const category: ICategory = await Category.create(req.body);
         res.status(200).json({
@@ -56,7 +56,7 @@ export const createCategory = expressAsyncHandler(
     }
 );
 
-export const updateCategory = expressAsyncHandler(
+export const updateCategory = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const category: ICategory | null = await Category.findByIdAndUpdate(
             req.params.id,
@@ -77,7 +77,7 @@ export const updateCategory = expressAsyncHandler(
     }
 );
 
-export const getCategory = expressAsyncHandler(
+export const getCategory = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const category: ICategory | null = await Category.findById(
             req.params.id
@@ -93,7 +93,7 @@ export const getCategory = expressAsyncHandler(
     }
 );
 
-export const deleteCategory = expressAsyncHandler(
+export const deleteCategory = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const category: ICategory | null = await Category.findByIdAndUpdate(
             req.params.id,
