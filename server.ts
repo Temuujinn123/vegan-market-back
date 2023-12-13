@@ -10,6 +10,7 @@ import fileUpload from "express-fileupload";
 import compression from "compression";
 import limiter from "express-rate-limit";
 import userRouter from "./routes/user";
+import wishlistRouter from "./routes/wishlist";
 
 dotenv.config({
     path: "./config/config.env",
@@ -46,6 +47,7 @@ app.use("/api/v1/products", cors(), productRouter);
 app.use("/api/v1/categories", cors(), categoryRouter);
 app.use("/api/v1/admin", cors(), adminUserRouter);
 app.use("/api/v1/user", cors(), userRouter);
+app.use("/api/v1/wishlist", cors(), wishlistRouter);
 app.use(errorHandler);
 
 const server = app.listen(port, () => {
