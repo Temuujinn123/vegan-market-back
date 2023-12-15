@@ -48,6 +48,67 @@ export const login = asyncHandler(
     }
 );
 
+export const getProfile = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const user = (req as any).user;
+
+        if (!user) {
+            throw new MyError("Can't find user.", 404);
+        }
+
+        res.status(200).json({
+            success: true,
+            data: user,
+        });
+    }
+);
+
+export const updateProfile = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const { _id } = (req as any).user;
+        const {
+            address_detail,
+            city,
+            committ,
+            district,
+            name,
+            phone_number,
+        }: {
+            address_detail: string;
+            city: string;
+            committ: string;
+            district: string;
+            name: string;
+            phone_number: number;
+        } = req.body;
+
+        if (!_id) {
+            throw new MyError("Can't find user", 404);
+        }
+
+        const user: IUser | null | undefined = await User.findByIdAndUpdate(
+            _id,
+            {
+                address_detail,
+                city,
+                committ,
+                district,
+                name,
+                phone_number,
+            }
+        );
+
+        if (!user) {
+            throw new MyError("Can't find user", 404);
+        }
+
+        res.status(200).json({
+            success: true,
+            data: user,
+        });
+    }
+);
+
 function generateCode() {
     let code = "";
     let str =

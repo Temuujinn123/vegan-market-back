@@ -21,6 +21,26 @@ const UserSchema = new mongoose.Schema<IUser>({
         type: Number,
         required: [true, "Please insert your phone number."],
     },
+    city: {
+        type: String,
+        required: false,
+        default: undefined,
+    },
+    district: {
+        type: String,
+        required: false,
+        default: undefined,
+    },
+    committ: {
+        type: String,
+        required: false,
+        default: undefined,
+    },
+    address_detail: {
+        type: String,
+        required: false,
+        default: undefined,
+    },
     password: {
         type: String,
         minLength: 4,
