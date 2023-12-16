@@ -24,22 +24,22 @@ const UserSchema = new mongoose.Schema<IUser>({
     city: {
         type: String,
         required: false,
-        default: undefined,
+        default: null,
     },
     district: {
         type: String,
         required: false,
-        default: undefined,
+        default: null,
     },
     committ: {
         type: String,
         required: false,
-        default: undefined,
+        default: null,
     },
     address_detail: {
         type: String,
         required: false,
-        default: undefined,
+        default: null,
     },
     password: {
         type: String,

@@ -2,22 +2,48 @@ import { NextFunction, Request, Response } from "express";
 import asyncHandler from "../middleware/asyncHandler";
 import { IWishlist } from "../types/wishlist";
 import Wishlist from "../models/Wishlist";
+import Product from "../models/Product";
+import { IProduct } from "../types/product";
 
 export const getWishlist = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { _id } = (req as any).user;
-        const productId: string | undefined = req.params.productId;
 
-        let wishlist: IWishlist | IWishlist[] | null;
+        const wishlist: IWishlist[] | null = await Wishlist.find({
+            user_id: _id,
+        });
 
-        if (productId || productId !== "") {
-            wishlist = await Wishlist.findOne({
-                user_id: _id,
-                product_id: productId,
+        if (wishlist && wishlist.length !== 0) {
+            const productIds: (string | undefined)[] = wishlist.map(
+                (wishlistItem) => wishlistItem.product_id
+            );
+
+            const products: IProduct[] = await Product.find({
+                _id: { $in: productIds },
+            }).limit(999999);
+
+            res.status(200).json({
+                success: true,
+                data: products,
             });
         } else {
-            wishlist = await Wishlist.find({ user_id: _id });
+            res.status(200).json({
+                success: true,
+                data: null,
+            });
         }
+    }
+);
+
+export const checkProductInWishlist = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const { _id } = (req as any).user;
+        const productId = req.query.productId;
+
+        const wishlist: IWishlist | null = await Wishlist.findOne({
+            user_id: _id,
+            product_id: productId,
+        });
 
         res.status(200).json({
             success: true,
@@ -50,7 +76,7 @@ export const deleteWishlist = asyncHandler(
 
         const result = await Wishlist.deleteOne({
             user_id: _id,
-            productId: productId,
+            product_id: productId,
         });
 
         res.status(200).json({

@@ -15,7 +15,9 @@ export const getCategoryProducts = asyncHandler(
         const select = req.query.select;
         const sort = req.query.sort;
         const search = req.query.search || "";
-        const category = (req.query.category as string)?.split(",") || [];
+        const category = req.query.category
+            ? (req.query.category as string)?.split(",")
+            : [];
 
         ["select", "sort", "page", "limit"].forEach(
             (el) => delete req.query[el]

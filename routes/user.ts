@@ -25,4 +25,8 @@ userRouter.route("/login").post(jsonParser, login);
 
 userRouter.route("/updateProfile").post(protect, jsonParser, updateProfile);
 
+// userRouter
+//     .route("/changeMail/code")
+//     .post(protect, jsonParser, sendChangeMailCode);
+
 export default userRouter;

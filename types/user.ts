@@ -4,10 +4,10 @@ export interface IUser extends mongoose.Document {
     name: string;
     email: string;
     phone_number: number;
-    city: string;
-    district: string;
-    committ: string;
-    address_detail: string;
+    city: string | null;
+    district: string | null;
+    committ: string | null;
+    address_detail: string | null;
     password: string;
     resetPasswordToken: string;
     resetPasswordExpire: Date;
