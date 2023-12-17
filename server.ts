@@ -11,6 +11,7 @@ import compression from "compression";
 import limiter from "express-rate-limit";
 import userRouter from "./routes/user";
 import wishlistRouter from "./routes/wishlist";
+import cartRouter from "./routes/cart";
 
 dotenv.config({
     path: "./config/config.env",
@@ -48,6 +49,7 @@ app.use("/api/v1/categories", cors(), categoryRouter);
 app.use("/api/v1/admin", cors(), adminUserRouter);
 app.use("/api/v1/user", cors(), userRouter);
 app.use("/api/v1/wishlist", cors(), wishlistRouter);
+app.use("/api/v1/cart", cors(), cartRouter);
 app.use(errorHandler);
 
 const server = app.listen(port, () => {
