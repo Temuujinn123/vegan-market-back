@@ -6,6 +6,7 @@ import User from "../models/User";
 import SendMail from "../utils/mail";
 import emailOptions from "../utils/mailer";
 import asyncHandler from "../middleware/asyncHandler";
+import { sendSMS } from "../utils/sendSMS";
 
 export const register = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -167,8 +168,6 @@ export const forgetPassword = asyncHandler(
                 }
             );
 
-            console.log("result ===========> ", result);
-
             res.status(200).json({ success: true });
         } else {
             res.status(200).json({ success: false });
@@ -218,5 +217,15 @@ export const checkChangePasswordCodeAndChangePassword = asyncHandler(
         } else {
             throw new MyError("Code is wrong", 400);
         }
+    }
+);
+
+export const sendSMSToPhone = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const { phoneNumber }: { phoneNumber: number } = req.body;
+        console.log("🚀 ~ file: user.ts:228 ~ phoneNumber:", phoneNumber);
+
+        const result = await sendSMS(phoneNumber);
+        console.log("🚀 ~ file: user.ts:230 ~ result:", result);
     }
 );

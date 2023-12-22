@@ -5,6 +5,7 @@ import {
     getProfile,
     login,
     register,
+    sendSMSToPhone,
     updateProfile,
 } from "../controller/user";
 import bodyparser from "body-parser";
@@ -24,6 +25,8 @@ userRouter
 userRouter.route("/login").post(jsonParser, login);
 
 userRouter.route("/updateProfile").post(protect, jsonParser, updateProfile);
+
+userRouter.route("/sendSMS").post(jsonParser, sendSMSToPhone);
 
 // userRouter
 //     .route("/changeMail/code")

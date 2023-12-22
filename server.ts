@@ -12,6 +12,8 @@ import limiter from "express-rate-limit";
 import userRouter from "./routes/user";
 import wishlistRouter from "./routes/wishlist";
 import cartRouter from "./routes/cart";
+import Invoice from "./utils/invoice";
+import axios from "axios";
 
 dotenv.config({
     path: "./config/config.env",
@@ -40,8 +42,25 @@ app.use(
 app.use(express.static("public"));
 app.use("/upload", express.static("upload"));
 
-app.get("/", (req: Request, res: Response) => {
-    res.status(200).json("Welcome!");
+var options = {
+    method: "POST",
+    url: "https://merchant-sandbox.qpay.mn/v2/auth/token",
+    headers: {
+        Authorization: "Basic",
+    },
+};
+
+app.get("/", async (req: Request, res: Response) => {
+    // const response = await Invoice();
+    await axios(options)
+        .then((response) => {
+            console.log(response.data);
+            res.status(200).json(response);
+        })
+        .catch((error: any) => {
+            console.error(error);
+            res.status(200).json(error.message);
+        });
 });
 
 app.use("/api/v1/products", cors(), productRouter);
