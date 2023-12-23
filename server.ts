@@ -51,16 +51,17 @@ var options = {
 };
 
 app.get("/", async (req: Request, res: Response) => {
+    res.status(200).json({ message: "Welcome" });
     // const response = await Invoice();
-    await axios(options)
-        .then((response) => {
-            console.log(response.data);
-            res.status(200).json(response);
-        })
-        .catch((error: any) => {
-            console.error(error);
-            res.status(200).json(error.message);
-        });
+    // await axios(options)
+    //     .then((response) => {
+    //         console.log(response.data);
+    //         res.status(200).json(response);
+    //     })
+    //     .catch((error: any) => {
+    //         console.error(error);
+    //         res.status(200).json(error.message);
+    //     });
 });
 
 app.use("/api/v1/products", cors(), productRouter);
