@@ -1,6 +1,7 @@
 import express from "express";
 import {
     createProduct,
+    deletePhoto,
     deleteProduct,
     getCategoryProducts,
     getProduct,
@@ -31,6 +32,8 @@ productRouter
 productRouter.route("/last/products").get(lastProducts);
 
 productRouter.route("/:id/photo").post(uploadProductPhoto);
+
+productRouter.route("/photo/:id").delete(protect, deletePhoto);
 
 // TODO: protect delete post deer nemeh
 

@@ -7,6 +7,8 @@ import path from "path";
 import Category from "../models/Category";
 import { ICategory } from "../types/category";
 import asyncHandler from "../middleware/asyncHandler";
+import Files from "../models/Files";
+import { IFiles } from "../types/files";
 
 export const getCategoryProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -41,9 +43,7 @@ export const getCategoryProducts = asyncHandler(
                 },
                 select
             )
-                .populate({
-                    path: "category",
-                })
+                .populate(["category", "img"])
                 .sort(sort as string)
                 .skip(pagination.start - 1)
                 .limit(limit as number)
@@ -56,9 +56,7 @@ export const getCategoryProducts = asyncHandler(
                 },
                 select
             )
-                .populate({
-                    path: "category",
-                })
+                .populate(["category", "img"])
                 .sort(sort as string)
                 .skip(pagination.start - 1)
                 .limit(limit as number)
@@ -78,6 +76,7 @@ export const getCategoryProducts = asyncHandler(
 export const lastProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const products: IProduct[] | null = await Product.find()
+            .populate(["category", "img"])
             .sort({ created_at: -1 })
             .limit(3)
             .where("is_deleted")
@@ -135,9 +134,7 @@ export const getProduct = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const product: IProduct | null = await Product.findById(
             req.params.id
-        ).populate({
-            path: "category",
-        });
+        ).populate(["category", "img"]);
 
         if (!product)
             throw new MyError(req.params.id + " is not found...", 400);
@@ -166,6 +163,16 @@ export const deleteProduct = asyncHandler(
     }
 );
 
+export const deletePhoto = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        await Files.findByIdAndDelete(req.params.id);
+
+        res.status(200).json({
+            success: true,
+        });
+    }
+);
+
 export const uploadProductPhoto = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const product: IProduct | null = await Product.findById(req.params.id);
@@ -175,34 +182,71 @@ export const uploadProductPhoto = asyncHandler(
 
         // image upload
 
-        const file = (req as any).files.file;
+        const files = (req as any).files.file;
 
-        console.log("file size =====>", file.size);
+        console.log("file size =====>", files);
 
-        if (!file.mimetype?.startsWith("image"))
-            throw new MyError("Please upload image file...", 400);
+        if (files?.name) {
+            console.log("----------------->");
+            if (!(files as any).mimetype?.startsWith("image"))
+                throw new MyError("Please upload image file...", 400);
 
-        if (
-            process.env.MAX_UPLOAD_FILE_SIZE &&
-            file.size > process.env.MAX_UPLOAD_FILE_SIZE
-        )
-            throw new MyError("Your image's size is too big...", 400);
+            if (
+                process.env.MAX_UPLOAD_FILE_SIZE &&
+                (files as any).size > process.env.MAX_UPLOAD_FILE_SIZE
+            )
+                throw new MyError("Your image's size is too big...", 400);
 
-        file.name = `photo_${req.params.id}${path.parse(file.name).ext}`;
+            (files as any).name = `photo_${
+                req.params.id
+            }${new Date().getTime()}${path.parse((files as any).name).ext}`;
 
-        file.mv(
-            `${process.env.FILE_UPLOAD_PATH}/${file.name}`,
-            (err: Error) => {
-                if (err) throw new MyError(err.message, 400);
+            (files as any).mv(
+                `${process.env.FILE_UPLOAD_PATH}/${(files as any).name}`,
+                async (err: Error) => {
+                    if (err) throw new MyError(err.message, 400);
 
-                product.img = file.name;
-                product.save();
+                    await Files.create({
+                        name: (files as any).name,
+                        product_id: product._id,
+                    });
 
-                res.status(200).json({
-                    success: true,
-                    data: file.name,
-                });
-            }
-        );
+                    return res.status(200).json({
+                        success: true,
+                    });
+                }
+            );
+        }
+
+        for (const file of files) {
+            if (!(file as any).mimetype?.startsWith("image"))
+                throw new MyError("Please upload image file...", 400);
+
+            if (
+                process.env.MAX_UPLOAD_FILE_SIZE &&
+                (file as any).size > process.env.MAX_UPLOAD_FILE_SIZE
+            )
+                throw new MyError("Your image's size is too big...", 400);
+
+            (file as any).name = `photo_${
+                req.params.id
+            }${new Date().getTime()}${path.parse((file as any).name).ext}`;
+
+            (file as any).mv(
+                `${process.env.FILE_UPLOAD_PATH}/${(file as any).name}`,
+                async (err: Error) => {
+                    if (err) throw new MyError(err.message, 400);
+
+                    await Files.create({
+                        name: (file as any).name,
+                        product_id: product._id,
+                    });
+                }
+            );
+        }
+
+        res.status(200).json({
+            success: true,
+        });
     }
 );

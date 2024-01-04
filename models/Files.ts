@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { ICategory } from "../types/category";
+import { IFiles } from "../types/files";
 
-const CategorySchema = new mongoose.Schema<ICategory>(
+const FilesSchema = new mongoose.Schema<IFiles>(
     {
         name: {
             type: String,
@@ -10,16 +10,14 @@ const CategorySchema = new mongoose.Schema<ICategory>(
             trim: true,
             max: [50, "Max length of category name is 50..."],
         },
+        product_id: {
+            type: mongoose.Schema.ObjectId,
+            ref: "Product",
+            required: [true],
+        },
         created_at: {
             type: Date,
             default: Date.now(),
-        },
-        updated_at: {
-            type: Date,
-        },
-        is_deleted: {
-            type: Boolean,
-            default: false,
         },
     },
     {
@@ -28,11 +26,4 @@ const CategorySchema = new mongoose.Schema<ICategory>(
     }
 );
 
-CategorySchema.virtual("products", {
-    ref: "Product",
-    localField: "_id",
-    foreignField: "category",
-    justOne: false,
-});
-
-export default mongoose.model("Category", CategorySchema);
+export default mongoose.model("Files", FilesSchema);
