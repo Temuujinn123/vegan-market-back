@@ -12,10 +12,8 @@ import limiter from "express-rate-limit";
 import userRouter from "./routes/user";
 import wishlistRouter from "./routes/wishlist";
 import cartRouter from "./routes/cart";
-import Invoice from "./utils/invoice";
-import axios from "axios";
-import { btoa } from "buffer";
 import filesRouter from "./routes/files";
+import invoiceRouter from "./routes/invoice";
 
 dotenv.config({
     path: "./config/config.env",
@@ -44,27 +42,15 @@ app.use(
 app.use(express.static("public"));
 app.use("/upload", express.static("upload"));
 
-const credentials = "TEST_MERCHANT:123456";
-const base64Credentials = btoa(credentials);
-
-var options = {
-    method: "POST",
-    url: "https://merchant-sandbox.qpay.mn/v2/auth/token",
-    headers: {
-        Authorization: `Basic ${base64Credentials}`,
-    },
-};
-
 const invoiceData = {
-    invoice_code: "TEST_INVOICE",
-    sender_invoice_no: "9329873948",
-    sender_branch_code: "branch",
-    invoice_receiver_code: "terminal",
+    invoice_code: "VEGAN_MARKET_INVOICE",
+    sender_invoice_no: "932987394812313",
+    invoice_receiver_code: "123456dwdada211aw",
     invoice_receiver_data: {
-        register: "TA89102712",
-        name: "Бат",
-        email: "info@info.mn",
-        phone: "99887766",
+        // register: "TA89102712",
+        name: "БАВУУ АЙГУЛ",
+        email: "aigulbavuu@gmail.com",
+        phone: "99844336",
     },
     invoice_description: "Invoice description",
     invoice_due_date: null,
@@ -103,34 +89,23 @@ const invoiceData = {
 app.get("/", async (req: Request, res: Response) => {
     // res.status(200).json({ message: "Welcome" });
     // const response = await Invoice();
-    let token: string | undefined = undefined;
-    await axios(options)
-        .then((response) => {
-            console.log(response.data);
-            token = response.data.access_token;
-            // res.status(200).json(response.data);
-        })
-        .catch((error: any) => {
-            console.error(error);
-            // res.status(200).json(error.message);
-        });
-
-    await axios({
-        method: "POST",
-        url: "https://merchant-sandbox.qpay.mn/v2/invoice",
-        data: invoiceData,
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    })
-        .then((response) => {
-            console.log(response.data);
-            res.status(200).json(response.data);
-        })
-        .catch((error: any) => {
-            console.error(error);
-            res.status(200).json(error.message);
-        });
+    // let token: string | undefined = await Invoice();
+    // await axios({
+    //     method: "POST",
+    //     url: "https://merchant.qpay.mn/v2/invoice",
+    //     data: invoiceData,
+    //     headers: {
+    //         Authorization: `Bearer ${token}`,
+    //     },
+    // })
+    //     .then((response) => {
+    //         console.log(response.data);
+    //         res.status(200).json(response.data);
+    //     })
+    //     .catch((error: any) => {
+    //         console.error(error);
+    //         res.status(200).json(error.message);
+    //     });
 });
 
 app.use("/api/v1/products", cors(), productRouter);
@@ -140,6 +115,8 @@ app.use("/api/v1/user", cors(), userRouter);
 app.use("/api/v1/wishlist", cors(), wishlistRouter);
 app.use("/api/v1/cart", cors(), cartRouter);
 app.use("/api/v1/files", cors(), filesRouter);
+app.use("/api/v1/invoice", cors(), invoiceRouter);
+
 app.use(errorHandler);
 
 const server = app.listen(port, () => {

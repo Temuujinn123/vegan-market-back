@@ -7,12 +7,17 @@ import SendMail from "../utils/mail";
 import emailOptions from "../utils/mailer";
 import asyncHandler from "../middleware/asyncHandler";
 import { sendSMS } from "../utils/sendSMS";
+import Cart from "../models/Cart";
 
 export const register = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const user: IUser = await User.create(req.body);
 
         const token: string = (user as any).getJsonWebToken();
+
+        await Cart.create({
+            user_id: user._id,
+        });
 
         res.status(200).json({
             success: true,

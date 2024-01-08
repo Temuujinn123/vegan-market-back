@@ -8,15 +8,10 @@ const CartSchema = new mongoose.Schema<ICart>(
             ref: "User",
             required: true,
         },
-        product_id: {
-            type: mongoose.Schema.ObjectId,
-            ref: "Product",
-            required: true,
-        },
-        quantity: {
-            type: Number,
+        is_bought: {
+            type: Boolean,
             required: false,
-            default: 1,
+            default: false,
         },
         created_at: {
             type: Date,
@@ -29,11 +24,11 @@ const CartSchema = new mongoose.Schema<ICart>(
     }
 );
 
-CartSchema.virtual("product", {
-    ref: "Product",
-    localField: "product_id",
-    foreignField: "_id",
-    justOne: true,
+CartSchema.virtual("cart_item", {
+    ref: "CartItem",
+    localField: "_id",
+    foreignField: "cart_id",
+    justOne: false,
 });
 
 export default mongoose.model("Cart", CartSchema);

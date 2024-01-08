@@ -1,17 +1,31 @@
 import { NextFunction, Request, Response } from "express";
 import asyncHandler from "../middleware/asyncHandler";
-import { ICart } from "../types/cart";
+import { ICart, ICartItem } from "../types/cart";
 import Cart from "../models/Cart";
+import CartItem from "../models/CartItem";
+import MyError from "../utils/myError";
 
 export const getCart = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { _id } = (req as any).user;
 
-        const cart: ICart[] | null = await Cart.find({
+        const cart: ICart | null = await Cart.findOne({
             user_id: _id,
-        }).populate({
-            path: "product",
-        });
+        })
+            .populate({
+                path: "cart_item",
+                model: "CartItem",
+                populate: {
+                    path: "product",
+                    model: "Product",
+                    populate: {
+                        path: "img",
+                        model: "Files",
+                    },
+                },
+            })
+            .where("is_bought")
+            .equals(false);
 
         res.status(200).json({
             success: true,
@@ -28,26 +42,36 @@ export const changeQuantityOfCart = asyncHandler(
 
         const cart: ICart | null = await Cart.findOne({
             user_id: _id,
+        })
+            .where("is_bought")
+            .equals(false);
+
+        if (!cart) {
+            throw new MyError("Cart not found", 400);
+        }
+
+        const cartItem: ICartItem | null = await CartItem.findOne({
+            cart_id: cart?._id,
             product_id: productId,
         });
 
         if (change === "plus") {
-            await cart?.updateOne({
-                quantity: cart.quantity + 1,
+            await cartItem?.updateOne({
+                quantity: cartItem.quantity + 1,
             });
         } else {
-            if (cart?.quantity === 1) {
-                await cart.deleteOne();
+            if (cartItem?.quantity === 1) {
+                await cartItem.deleteOne();
             } else {
-                await cart?.updateOne({
-                    quantity: cart.quantity - 1,
+                await cartItem?.updateOne({
+                    quantity: cartItem.quantity - 1,
                 });
             }
         }
 
         res.status(200).json({
             success: true,
-            data: cart,
+            data: cartItem,
         });
     }
 );
@@ -59,28 +83,34 @@ export const createCart = asyncHandler(
 
         const cart: ICart | null = await Cart.findOne({
             user_id: _id,
+        })
+            .where("is_bought")
+            .equals(false);
+
+        const cartItem: ICartItem | null = await CartItem.findOne({
+            cart_id: cart?._id,
             product_id: productId,
         });
 
-        if (cart) {
-            await cart.updateOne({
-                quantity: cart.quantity + 1,
+        if (cartItem) {
+            await cartItem.updateOne({
+                quantity: cartItem.quantity + 1,
             });
 
             return res.status(200).json({
                 success: true,
-                data: cart,
+                data: cartItem,
             });
         }
 
-        const newCart: ICart = await Cart.create({
-            user_id: _id,
+        const newCartItem: ICartItem = await CartItem.create({
+            cart_id: cart?._id,
             product_id: productId,
         });
 
         res.status(200).json({
             success: true,
-            data: newCart,
+            data: newCartItem,
         });
     }
 );
@@ -90,8 +120,14 @@ export const deleteCart = asyncHandler(
         const { _id } = (req as any).user;
         const { productId } = req.body;
 
-        const result = await Cart.deleteOne({
+        const cart = await Cart.findOne({
             user_id: _id,
+        })
+            .where("is_bought")
+            .equals(false);
+
+        const result = await CartItem.deleteOne({
+            cart_id: cart?._id,
             product_id: productId,
         });
 
