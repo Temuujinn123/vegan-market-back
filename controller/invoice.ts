@@ -44,6 +44,7 @@ export const createInvoice = asyncHandler(
         });
 
         const qpayToken: string | undefined = await GetQpayToken();
+        console.log("🚀 ~ file: invoice.ts:47 ~ qpayToken:", qpayToken);
 
         if (!qpayToken)
             throw new MyError("Алдаа гарлаа та дахин оролдоно уу.", 401);

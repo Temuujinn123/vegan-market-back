@@ -25,6 +25,7 @@ var options = {
 };
 
 export const GetQpayToken = async (): Promise<string | undefined> => {
+    console.log("🚀 ~ file: invoice.ts:12 ~ credentials:", credentials);
     const response = await axios(options);
     let token: string | undefined;
     if (response.data) {
@@ -41,6 +42,12 @@ export const CreateQpayInvoice = async (
     receiverCode: string,
     amount: number
 ): Promise<string | undefined> => {
+    console.log(
+        "------------> ",
+        process.env.NODE_ENV === "production"
+            ? process.env.PROD_QPAY_API_BASE_URL
+            : process.env.QPAY_API_BASE_URL
+    );
     const response = await axios({
         method: "POST",
         url: `${
