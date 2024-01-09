@@ -14,6 +14,7 @@ import wishlistRouter from "./routes/wishlist";
 import cartRouter from "./routes/cart";
 import filesRouter from "./routes/files";
 import invoiceRouter from "./routes/invoice";
+import testRouter from "./routes/test";
 
 dotenv.config({
     path: "./config/config.env",
@@ -34,6 +35,7 @@ app.use(
         origin: [
             "http://localhost:3000",
             "https://vegan-market-front.vercel.app",
+            "https://main--singular-truffle-fe1003.netlify.app",
         ],
         optionsSuccessStatus: 200,
     })
@@ -50,6 +52,7 @@ app.use("/api/v1/wishlist", cors(), wishlistRouter);
 app.use("/api/v1/cart", cors(), cartRouter);
 app.use("/api/v1/files", cors(), filesRouter);
 app.use("/api/v1/invoice", cors(), invoiceRouter);
+app.use("/api/v1/test", testRouter);
 
 app.use(errorHandler);
 
