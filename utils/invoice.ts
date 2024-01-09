@@ -2,12 +2,12 @@ import axios from "axios";
 
 const credentials = `${
     process.env.NODE_ENV === "production"
-        ? process.env.PROD_QPAY_USERNAME
-        : process.env.QPAY_USERNAME
+        ? process.env.PROD_QPAY_USERNAME && process.env.PROD_QPAY_USERNAME
+        : process.env.QPAY_USERNAME && process.env.QPAY_USERNAME
 }:${
     process.env.NODE_ENV === "production"
-        ? process.env.PROD_QPAY_PASS
-        : process.env.QPAY_PASS
+        ? process.env.PROD_QPAY_PASS && process.env.PROD_QPAY_PASS
+        : process.env.QPAY_PASS && process.env.QPAY_PASS
 }`;
 
 const base64Credentials = btoa(credentials);
@@ -16,8 +16,9 @@ var options = {
     method: "POST",
     url: `${
         process.env.NODE_ENV === "production"
-            ? process.env.PROD_QPAY_API_BASE_URL
-            : process.env.QPAY_API_BASE_URL
+            ? process.env.PROD_QPAY_API_BASE_URL &&
+              process.env.PROD_QPAY_API_BASE_URL
+            : process.env.QPAY_API_BASE_URL && process.env.QPAY_API_BASE_URL
     }/auth/token`,
     headers: {
         Authorization: `Basic ${base64Credentials}`,
@@ -45,15 +46,17 @@ export const CreateQpayInvoice = async (
     console.log(
         "------------> ",
         process.env.NODE_ENV === "production"
-            ? process.env.PROD_QPAY_API_BASE_URL
-            : process.env.QPAY_API_BASE_URL
+            ? process.env.PROD_QPAY_API_BASE_URL &&
+                  process.env.PROD_QPAY_API_BASE_URL
+            : process.env.QPAY_API_BASE_URL && process.env.QPAY_API_BASE_URL
     );
     const response = await axios({
         method: "POST",
         url: `${
             process.env.NODE_ENV === "production"
-                ? process.env.PROD_QPAY_API_BASE_URL
-                : process.env.QPAY_API_BASE_URL
+                ? process.env.PROD_QPAY_API_BASE_URL &&
+                  process.env.PROD_QPAY_API_BASE_URL
+                : process.env.QPAY_API_BASE_URL && process.env.QPAY_API_BASE_URL
         }/invoice`,
         data: {
             invoice_code: "VEGAN_MARKET_INVOICE",
@@ -63,8 +66,9 @@ export const CreateQpayInvoice = async (
             amount: amount,
             callback_url: `${
                 process.env.NODE_ENV === "production"
-                    ? process.env.PROD_API_BASE_URL
-                    : process.env.API_BASE_URL
+                    ? process.env.PROD_API_BASE_URL &&
+                      process.env.PROD_API_BASE_URL
+                    : process.env.API_BASE_URL && process.env.API_BASE_URL
             }/payments?payment_id=${senderNumber}`,
         },
         headers: {
