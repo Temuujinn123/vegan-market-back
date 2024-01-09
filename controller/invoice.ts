@@ -11,18 +11,6 @@ import {
 } from "../utils/generateRandom";
 import axios from "axios";
 
-const credentials = `${process.env.PROD_QPAY_USERNAME}:${process.env.PROD_QPAY_PASS}`;
-
-const base64Credentials = btoa(credentials);
-
-var options = {
-    method: "POST",
-    url: `${process.env.PROD_QPAY_API_BASE_URL}/auth/token`,
-    headers: {
-        Authorization: `Basic ${base64Credentials}`,
-    },
-};
-
 export const getInvoices = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         // res.status(200).json({
@@ -76,6 +64,22 @@ export const createInvoice = asyncHandler(
 );
 
 const GetQpayToken = async (): Promise<string | undefined> => {
+    const qpayUsername = process.env.PROD_QPAY_USERNAME;
+    const qpayPassword = process.env.PROD_QPAY_PASS;
+    const qpayBaseUrl = process.env.PROD_QPAY_API_BASE_URL;
+
+    const credentials = `${qpayUsername}:${qpayPassword}`;
+
+    const base64Credentials = btoa(credentials);
+
+    var options = {
+        method: "POST",
+        url: `${qpayBaseUrl}/auth/token`,
+        headers: {
+            Authorization: `Basic ${base64Credentials}`,
+        },
+    };
+
     console.log("🚀 ~ file: invoice.ts:12 ~ credentials:", credentials);
     const response = await axios(options);
     let token: string | undefined;
@@ -93,17 +97,21 @@ const CreateQpayInvoice = async (
     receiverCode: string,
     amount: number
 ): Promise<string | undefined> => {
+    const qpayBaseUrl = process.env.PROD_QPAY_API_BASE_URL;
+    const apiBaseUrl = process.env.PROD_API_BASE_URL;
+
     console.log("------------> ", process.env.PROD_QPAY_API_BASE_URL);
+
     const response = await axios({
         method: "POST",
-        url: `${process.env.PROD_QPAY_API_BASE_URL}/invoice`,
+        url: `${qpayBaseUrl}/invoice`,
         data: {
             invoice_code: "VEGAN_MARKET_INVOICE",
             sender_invoice_no: senderNumber,
             invoice_receiver_code: receiverCode,
             invoice_description: "Description",
             amount: amount,
-            callback_url: `${process.env.PROD_API_BASE_URL}/payments?payment_id=${senderNumber}`,
+            callback_url: `${apiBaseUrl}/payments?payment_id=${senderNumber}`,
         },
         headers: {
             Authorization: `Bearer ${token}`,
