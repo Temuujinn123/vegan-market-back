@@ -14,6 +14,22 @@ const ProductSchema = new mongoose.Schema<IProduct>(
             type: Number,
             required: [true, "Insert price of the product..."],
         },
+        stock: {
+            type: Number,
+            required: [true, "Insert stock of the product..."],
+        },
+        storage_duration: {
+            type: Number,
+            required: [true, "Insert storage duration of the product..."],
+        },
+        made_in_country: {
+            type: String,
+            required: [true, "Insert made in country of the product..."],
+        },
+        weight: {
+            type: String,
+            required: [true, "Insert weight of the product..."],
+        },
         desc: {
             type: String,
             required: [true, "Description of the product..."],

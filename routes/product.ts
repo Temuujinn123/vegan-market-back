@@ -16,8 +16,6 @@ const productRouter = express.Router({ mergeParams: true });
 
 const jsonParser = bodyparser.json();
 
-// TODO: protect nemeh
-
 productRouter
     .route("/")
     .get(getCategoryProducts)
@@ -31,10 +29,8 @@ productRouter
 
 productRouter.route("/last/products").get(lastProducts);
 
-productRouter.route("/:id/photo").post(uploadProductPhoto);
+productRouter.route("/:id/photo").post(protect, uploadProductPhoto);
 
 productRouter.route("/photo/:id").delete(protect, deletePhoto);
-
-// TODO: protect delete post deer nemeh
 
 export default productRouter;

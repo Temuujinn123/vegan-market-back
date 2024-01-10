@@ -14,6 +14,10 @@ export interface IProduct extends mongoose.Document {
     name: string;
     img: string;
     price: number;
+    storage_duration: number;
+    stock: number;
+    made_in_country: string;
+    weight: string;
     desc: string;
     category?: string;
     created_at: Date;

@@ -20,6 +20,40 @@ export const getInvoices = asyncHandler(
     }
 );
 
+export const confirmInvoicePayment = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const { invoice_id } = req.params;
+
+        const invoice: IInvoice | null = await Invoice.findByIdAndUpdate(
+            invoice_id,
+            {
+                is_paid: true,
+            }
+        );
+
+        if (!invoice) throw new MyError("Invoice not found", 404);
+
+        const cart: ICart | null = await Cart.findByIdAndUpdate(
+            invoice.cart_id,
+            {
+                is_bought: true,
+            }
+        );
+
+        if (!cart) throw new MyError("Cart not found", 404);
+
+        const user_id = cart.user_id;
+
+        await Cart.create({
+            user_id,
+        });
+
+        res.status(200).json({
+            success: true,
+        });
+    }
+);
+
 export const createInvoice = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { _id } = (req as any).user;
@@ -44,7 +78,6 @@ export const createInvoice = asyncHandler(
         });
 
         const qpayToken: string | undefined = await GetQpayToken();
-        console.log("🚀 ~ file: invoice.ts:47 ~ qpayToken:", qpayToken);
 
         if (!qpayToken)
             throw new MyError("Алдаа гарлаа та дахин оролдоно уу.", 401);
@@ -53,7 +86,8 @@ export const createInvoice = asyncHandler(
             qpayToken,
             randomNumber.toString(),
             randomText,
-            invoice.amount
+            invoice.amount,
+            invoice._id
         );
 
         res.status(200).json({
@@ -63,6 +97,7 @@ export const createInvoice = asyncHandler(
     }
 );
 
+// Get QPay token function
 const GetQpayToken = async (): Promise<string | undefined> => {
     const qpayUsername = process.env.PROD_QPAY_USERNAME;
     const qpayPassword = process.env.PROD_QPAY_PASS;
@@ -80,7 +115,6 @@ const GetQpayToken = async (): Promise<string | undefined> => {
         },
     };
 
-    console.log("🚀 ~ file: invoice.ts:12 ~ credentials:", credentials);
     const response = await axios(options);
     let token: string | undefined;
     if (response.data) {
@@ -91,16 +125,16 @@ const GetQpayToken = async (): Promise<string | undefined> => {
     return token;
 };
 
+// Create QPay invocie function
 const CreateQpayInvoice = async (
     token: string,
     senderNumber: string,
     receiverCode: string,
-    amount: number
+    amount: number,
+    invocieId: string
 ): Promise<string | undefined> => {
     const qpayBaseUrl = process.env.PROD_QPAY_API_BASE_URL;
     const apiBaseUrl = process.env.PROD_API_BASE_URL;
-
-    console.log("------------> ", process.env.PROD_QPAY_API_BASE_URL);
 
     const response = await axios({
         method: "POST",
@@ -111,7 +145,7 @@ const CreateQpayInvoice = async (
             invoice_receiver_code: receiverCode,
             invoice_description: "Description",
             amount: amount,
-            callback_url: `${apiBaseUrl}/payments?payment_id=${senderNumber}`,
+            callback_url: `${apiBaseUrl}/invoice/payment?invoice_id=${invocieId}`,
         },
         headers: {
             Authorization: `Bearer ${token}`,
