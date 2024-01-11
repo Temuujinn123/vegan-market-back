@@ -30,6 +30,19 @@ const ProductSchema = new mongoose.Schema<IProduct>(
             type: String,
             required: [true, "Insert weight of the product..."],
         },
+        is_sale: {
+            type: Boolean,
+            default: false,
+        },
+        sale_price: {
+            type: Number,
+        },
+        sale_start_date: {
+            type: Date,
+        },
+        sale_end_date: {
+            type: Date,
+        },
         desc: {
             type: String,
             required: [true, "Description of the product..."],

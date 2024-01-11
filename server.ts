@@ -14,6 +14,7 @@ import wishlistRouter from "./routes/wishlist";
 import cartRouter from "./routes/cart";
 import filesRouter from "./routes/files";
 import invoiceRouter from "./routes/invoice";
+import bannerFilesRouter from "./routes/bannerFiles";
 
 dotenv.config({
     path: "./config/config.env",
@@ -50,6 +51,7 @@ app.use("/api/v1/wishlist", cors(), wishlistRouter);
 app.use("/api/v1/cart", cors(), cartRouter);
 app.use("/api/v1/files", cors(), filesRouter);
 app.use("/api/v1/invoice", cors(), invoiceRouter);
+app.use("/api/v1/banner", cors(), bannerFilesRouter);
 
 app.use(errorHandler);
 
