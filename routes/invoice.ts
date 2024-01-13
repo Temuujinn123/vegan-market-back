@@ -22,6 +22,6 @@ invoiceRouter
 
 invoiceRouter.route("/create").post(jsonParser, protect, createInvoice);
 
-invoiceRouter.route("/payment").post(jsonParser, confirmInvoicePayment);
+invoiceRouter.route("/payment").get(jsonParser, confirmInvoicePayment);
 
 export default invoiceRouter;
