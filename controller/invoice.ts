@@ -10,13 +10,106 @@ import {
     generateRandomText,
 } from "../utils/generateRandom";
 import axios from "axios";
+import Pagintate from "../utils/paginate";
 
 export const getInvoices = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        // res.status(200).json({
-        //     success: true,
-        //     data: invoices,
-        // });
+        const page = req.query.page || 1;
+        const limit = req.query.limit || 10;
+        const search = req.query.search || "";
+        const startDate = req.query.startDate
+            ? new Date(req.query.startDate as string)
+            : undefined;
+        const endDate = req.query.endDate
+            ? new Date(req.query.endDate as string)
+            : undefined;
+
+        ["page", "limit", "search", "startDate", "endDate"].forEach(
+            (el) => delete req.query[el]
+        );
+
+        const pagination = await Pagintate(
+            page as number,
+            limit as number,
+            Invoice,
+            { is_paid: true }
+        );
+
+        const filter: any = {};
+
+        if (startDate && endDate) {
+            filter.created_at = {
+                $gte: startDate,
+                $lte: endDate,
+            };
+        } else if (startDate) {
+            filter.created_at = { $gte: startDate };
+        } else if (endDate) {
+            filter.created_at = { $lte: endDate };
+        }
+
+        const invoices: IInvoice[] = await Invoice.find(filter)
+            .populate({
+                path: "cart_id",
+                model: "Cart",
+                populate: {
+                    path: "user_id",
+                    model: "User",
+                },
+            })
+            .skip(pagination.start - 1)
+            .limit(limit as number)
+            .where("is_paid")
+            .equals(true);
+
+        res.status(200).json({
+            success: true,
+            count: invoices.length,
+            data: invoices,
+            pagination,
+        });
+    }
+);
+
+export const getInvoice = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const invoice: IInvoice | null = await Invoice.findById(req.params.id)
+            .populate({
+                path: "cart",
+                model: "Cart",
+                populate: {
+                    path: "cart_item",
+                    model: "CartItem",
+                    populate: {
+                        path: "product",
+                        model: "Product",
+                    },
+                },
+            })
+            .populate({
+                path: "user",
+            })
+            .where("is_paid")
+            .equals(true);
+
+        res.status(200).json({
+            success: true,
+            data: invoice,
+        });
+    }
+);
+
+export const updateInvoice = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const invoice: IInvoice | null = await Invoice.findByIdAndUpdate(
+            req.params.id,
+            { is_delivered: req.body.is_delivered }
+        );
+
+        res.status(200).json({
+            success: true,
+            data: invoice,
+        });
     }
 );
 

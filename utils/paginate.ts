@@ -1,12 +1,20 @@
 import { Model } from "mongoose";
 import { PaginationDto } from "../types/product";
+import Invoice from "../models/Invoice";
 
 const Pagintate = async function (
     page: number,
     limit: number,
-    model: Model<any>
+    model: Model<any>,
+    filter?: Object
 ) {
-    const total = await model.countDocuments({ is_deleted: false });
+    if (filter === undefined) {
+        filter = {
+            is_deleted: false,
+        };
+    }
+
+    const total = await model.countDocuments(filter);
     const pageCount = Math.ceil(total / limit);
     const start = (page - 1) * limit + 1;
     let end = start + limit - 1;

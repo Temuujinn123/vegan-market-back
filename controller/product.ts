@@ -20,15 +20,31 @@ export const getCategoryProducts = asyncHandler(
         const category = req.query.category
             ? (req.query.category as string)?.split(",")
             : [];
+        const is_sale = req.query.is_sale ?? undefined;
 
-        ["select", "sort", "page", "limit"].forEach(
+        ["select", "sort", "page", "limit", "is_sale"].forEach(
             (el) => delete req.query[el]
         );
+
+        const filter: any = {
+            is_deleted: false,
+        };
+
+        if (is_sale) {
+            (filter.is_sale = Boolean(is_sale)),
+                (filter.sale_start_date = {
+                    $lte: new Date(),
+                });
+            filter.sale_end_date = {
+                $gte: new Date(),
+            };
+        }
 
         const pagination = await Pagintate(
             page as number,
             limit as number,
-            Product
+            Product,
+            filter
         );
 
         const nameRegex = new RegExp(search as string, "i");
@@ -40,6 +56,7 @@ export const getCategoryProducts = asyncHandler(
                 {
                     name: { $regex: nameRegex },
                     category: { $in: category },
+                    ...filter,
                 },
                 select
             )
@@ -53,6 +70,7 @@ export const getCategoryProducts = asyncHandler(
             products = await Product.find(
                 {
                     name: { $regex: nameRegex },
+                    ...filter,
                 },
                 select
             )

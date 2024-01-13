@@ -18,7 +18,6 @@ export const getBannerPhotos = asyncHandler(
 
 export const deleteBannerPhoto = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        console.log(req.params.id);
         const file: IBannerFile | null = await BannerFiles.findById(
             req.params.id
         );
