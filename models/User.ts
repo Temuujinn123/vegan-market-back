@@ -4,6 +4,11 @@ import jwt from "jsonwebtoken";
 import { IUser } from "../types/user";
 
 const UserSchema = new mongoose.Schema<IUser>({
+    auth_id: {
+        type: String,
+        required: false,
+        default: null,
+    },
     name: {
         type: String,
         required: [true, "Please insert your name."],
@@ -19,7 +24,8 @@ const UserSchema = new mongoose.Schema<IUser>({
     },
     phone_number: {
         type: Number,
-        required: [true, "Please insert your phone number."],
+        required: [false, "Please insert your phone number."],
+        default: null,
     },
     city: {
         type: String,

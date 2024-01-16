@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db";
 import cors from "cors";
@@ -15,6 +15,8 @@ import cartRouter from "./routes/cart";
 import filesRouter from "./routes/files";
 import invoiceRouter from "./routes/invoice";
 import bannerFilesRouter from "./routes/bannerFiles";
+import passport from "passport";
+import asyncHandler from "./middleware/asyncHandler";
 
 dotenv.config({
     path: "./config/config.env",
@@ -52,6 +54,32 @@ app.use("/api/v1/cart", cors(), cartRouter);
 app.use("/api/v1/files", cors(), filesRouter);
 app.use("/api/v1/invoice", cors(), invoiceRouter);
 app.use("/api/v1/banner", cors(), bannerFilesRouter);
+
+// app.use(passport.initialize());
+
+// app.get(
+//     "/auth/google",
+//     passport.authenticate("google", { scope: ["profile", "email"] })
+// );
+
+app.post(
+    "/auth/google/callback",
+    async (req: Request, res: Response, next: NextFunction) => {
+        console.log("========================> ", req.body);
+        res.status(200).json({
+            success: true,
+        });
+    }
+);
+
+// app.get(
+//     "/auth/google/callback",
+//     passport.authenticate("google", { failureRedirect: "/" }),
+//     (req, res) => {
+//         // Successful authentication, redirect to the frontend
+//         res.redirect("http://localhost:3000"); // Adjust this URL based on your Next.js frontend URL
+//     }
+// );
 
 app.use(errorHandler);
 

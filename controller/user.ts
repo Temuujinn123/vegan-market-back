@@ -234,3 +234,29 @@ export const sendSMSToPhone = asyncHandler(
         console.log("🚀 ~ file: user.ts:230 ~ result:", result);
     }
 );
+
+export const checkUserWithAuthId = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const { authId, email }: { authId: string; email: string } = req.body;
+
+        if (!authId) {
+            throw new MyError("Please insert your authId", 400);
+        }
+
+        const user: any = await User.findOne({
+            $or: [{ auth_id: authId }, { email }],
+        });
+
+        if (!user) {
+            res.status(200).json({
+                success: false,
+                data: null,
+            });
+        } else {
+            res.status(200).json({
+                success: true,
+                data: user,
+            });
+        }
+    }
+);
