@@ -28,6 +28,8 @@ export const getInvoices = asyncHandler(
             (el) => delete req.query[el]
         );
 
+        const { _id } = (req as any).user;
+
         const pagination = await Pagintate(
             page as number,
             limit as number,
@@ -46,6 +48,10 @@ export const getInvoices = asyncHandler(
             filter.created_at = { $gte: startDate };
         } else if (endDate) {
             filter.created_at = { $lte: endDate };
+        }
+
+        if (_id) {
+            filter.user_id = _id;
         }
 
         const invoices: IInvoice[] = await Invoice.find(filter)

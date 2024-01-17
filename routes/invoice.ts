@@ -13,7 +13,7 @@ const invoiceRouter = express.Router();
 
 const jsonParser = bodyparser.json();
 
-invoiceRouter.route("/").get(jsonParser, protect, getInvoices);
+invoiceRouter.route("").get(jsonParser, protect, getInvoices);
 
 invoiceRouter
     .route("/:id")
