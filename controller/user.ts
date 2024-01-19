@@ -260,3 +260,43 @@ export const checkUserWithAuthId = asyncHandler(
         }
     }
 );
+
+export const changePassword = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const { _id } = (req as any).user;
+        const {
+            currentPassword,
+            newPassword,
+        }: { currentPassword: string; newPassword: string } = req.body;
+
+        if (!currentPassword || !newPassword) {
+            throw new MyError("Please insert your password", 400);
+        }
+
+        const user: any = await User.findById(_id).select("+password");
+
+        if (!user) {
+            throw new MyError("Can't find user", 404);
+        }
+
+        const isMatch: boolean = await (user as any).checkPassword(
+            currentPassword
+        );
+
+        if (!isMatch) {
+            throw new MyError("Current password is wrong", 400);
+        }
+
+        const salt: string = await bcrypt.genSalt(10);
+        const newHashedPassword: string = await bcrypt.hash(newPassword, salt);
+
+        const changedUser = await User.findByIdAndUpdate(_id, {
+            password: newHashedPassword,
+        });
+
+        res.status(200).json({
+            success: true,
+            data: changedUser,
+        });
+    }
+);

@@ -1,5 +1,6 @@
 import express from "express";
 import {
+    changePassword,
     checkChangePasswordCodeAndChangePassword,
     checkUserWithAuthId,
     forgetPassword,
@@ -30,6 +31,8 @@ userRouter.route("/updateProfile").post(protect, jsonParser, updateProfile);
 userRouter.route("/sendSMS").post(jsonParser, sendSMSToPhone);
 
 userRouter.route("/check").post(jsonParser, checkUserWithAuthId);
+
+userRouter.route("/updatePassword").post(jsonParser, protect, changePassword);
 
 // userRouter
 //     .route("/changeMail/code")
