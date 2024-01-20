@@ -1,9 +1,14 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const connectDB = async () => {
-  const conn = await mongoose.connect(process.env.MONGODB_URI ?? "", {});
+    const mongodb_uri =
+        process.env.NODE_ENV === "production"
+            ? process.env.PROD_MONGODB_URI
+            : process.env.MONGODB_URI;
 
-  console.log(`MongoDB connected: ${conn.connection.host}`);
+    const conn = await mongoose.connect(mongodb_uri ?? "", {});
+
+    console.log(`MongoDB connected: ${conn.connection.host}`);
 };
 
 export default connectDB;
