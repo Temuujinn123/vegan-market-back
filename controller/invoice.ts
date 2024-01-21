@@ -157,6 +157,8 @@ export const createInvoice = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { _id } = (req as any).user;
 
+        const method: string = req.params.method;
+
         const cart: ICart | null = await Cart.findOne({
             user_id: _id,
         })
@@ -176,23 +178,45 @@ export const createInvoice = asyncHandler(
             user_id: _id,
         });
 
-        const qpayToken: string | undefined = await GetQpayToken();
+        if (method === "qpay") {
+            const qpayToken: string | undefined = await GetQpayToken();
 
-        if (!qpayToken)
-            throw new MyError("Алдаа гарлаа та дахин оролдоно уу.", 401);
+            if (!qpayToken)
+                throw new MyError("Алдаа гарлаа та дахин оролдоно уу.", 401);
 
-        const qpayShortUrl = await CreateQpayInvoice(
-            qpayToken,
-            randomNumber.toString(),
-            randomText,
-            invoice.amount,
-            invoice._id
-        );
+            const qpayShortUrl = await CreateQpayInvoice(
+                qpayToken,
+                randomNumber.toString(),
+                randomText,
+                invoice.amount,
+                invoice._id
+            );
 
-        res.status(200).json({
-            success: true,
-            data: qpayShortUrl,
-        });
+            res.status(200).json({
+                success: true,
+                data: qpayShortUrl,
+            });
+        } else {
+            const cart: ICart | null = await Cart.findByIdAndUpdate(
+                invoice.cart_id,
+                {
+                    is_bought: true,
+                }
+            );
+
+            if (!cart) throw new MyError("Cart not found", 404);
+
+            const user_id = cart.user_id;
+
+            await Cart.create({
+                user_id,
+            });
+
+            res.status(200).json({
+                success: true,
+                data: invoice,
+            });
+        }
     }
 );
 
@@ -234,12 +258,13 @@ const CreateQpayInvoice = async (
 ): Promise<string | undefined> => {
     const qpayBaseUrl = process.env.PROD_QPAY_API_BASE_URL;
     const apiBaseUrl = process.env.PROD_API_BASE_URL;
+    const invoiceCode = process.env.PROD_QPAY_INVOICE;
 
     const response = await axios({
         method: "POST",
         url: `${qpayBaseUrl}/invoice`,
         data: {
-            invoice_code: "VEGAN_MARKET_INVOICE",
+            invoice_code: invoiceCode,
             sender_invoice_no: senderNumber,
             invoice_receiver_code: receiverCode,
             invoice_description: "Description",
