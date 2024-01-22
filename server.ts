@@ -17,6 +17,7 @@ import invoiceRouter from "./routes/invoice";
 import bannerFilesRouter from "./routes/bannerFiles";
 import passport from "passport";
 import asyncHandler from "./middleware/asyncHandler";
+import path from "path";
 
 dotenv.config({
     path: "./config/config.env",
@@ -41,6 +42,8 @@ app.use(
         optionsSuccessStatus: 200,
     })
 );
+
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use(express.static("public"));
 app.use("/upload", express.static("upload"));
