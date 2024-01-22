@@ -1,0 +1,3 @@
+services:
+ http:
+    publicDir: "public/upload"

@@ -1,9 +1,0 @@
-{
-  "service": {
-    "http": {
-      "internal_port": 5000,
-      "publicDir": "public",
-      "staticDir": "public"
-    }
-  }
-}
