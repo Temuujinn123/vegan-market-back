@@ -82,6 +82,7 @@ export const getCategoryProducts = asyncHandler(
     }
 );
 
+// get last three products
 export const lastProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const products: IProduct[] | null = await Product.find()
