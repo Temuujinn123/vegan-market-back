@@ -43,9 +43,6 @@ app.use(
     })
 );
 
-// wdd
-app.use(express.static(path.join(__dirname, "public")));
-
 app.use(express.static("public"));
 app.use("/upload", express.static("upload"));
 
