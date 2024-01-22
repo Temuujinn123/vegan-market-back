@@ -45,6 +45,10 @@ const InvoiceSchema = new mongoose.Schema<IInvoice>(
             type: Boolean,
             default: false,
         },
+        method: {
+            type: String,
+            required: true,
+        },
         updated_at: {
             type: Date,
         },

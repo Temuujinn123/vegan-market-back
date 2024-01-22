@@ -23,6 +23,15 @@ export const getInvoices = asyncHandler(
         const endDate = req.query.endDate
             ? new Date(req.query.endDate as string)
             : undefined;
+        const isPaid: boolean | undefined = req.query.isPaid
+            ? Boolean(req.query.isPaid)
+            : undefined;
+        const isDelivered: boolean | undefined = req.query.isDelivered
+            ? Boolean(req.query.isDelivered)
+            : undefined;
+        const isPending: boolean | undefined = req.query.isPending
+            ? Boolean(req.query.isPending)
+            : undefined;
 
         ["page", "limit", "search", "startDate", "endDate"].forEach(
             (el) => delete req.query[el]
@@ -30,14 +39,18 @@ export const getInvoices = asyncHandler(
 
         const { _id } = (req as any).user;
 
+        const filter: any = {};
+
+        if (isPaid) filter.is_paid = isPaid;
+        if (isDelivered) filter.is_delivered = isDelivered;
+        if (isPending) filter.is_paid = false;
+
         const pagination = await Pagintate(
             page as number,
             limit as number,
             Invoice,
-            { is_paid: true }
+            filter
         );
-
-        const filter: any = {};
 
         if (startDate && endDate) {
             filter.created_at = {
@@ -48,6 +61,11 @@ export const getInvoices = asyncHandler(
             filter.created_at = { $gte: startDate };
         } else if (endDate) {
             filter.created_at = { $lte: endDate };
+        }
+
+        if (search) {
+            const searchRegex = new RegExp(search as string, "i");
+            filter.sender_invoice_no = { $regex: searchRegex };
         }
 
         if (_id) {
@@ -65,8 +83,7 @@ export const getInvoices = asyncHandler(
             })
             .skip(pagination.start - 1)
             .limit(limit as number)
-            .where("is_paid")
-            .equals(true);
+            .sort({ created_at: -1 });
 
         res.status(200).json({
             success: true,
@@ -94,9 +111,7 @@ export const getInvoice = asyncHandler(
             })
             .populate({
                 path: "user",
-            })
-            .where("is_paid")
-            .equals(true);
+            });
 
         res.status(200).json({
             success: true,
@@ -107,9 +122,34 @@ export const getInvoice = asyncHandler(
 
 export const updateInvoice = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+        const { is_delivered, is_paid } = req.body;
+
+        if (is_delivered && is_paid) {
+            throw new MyError(
+                "You can not update is_delivered and is_paid at the same time",
+                400
+            );
+        }
+
+        if (is_paid === undefined && is_delivered === undefined) {
+            throw new MyError("You must update is_paid or is_delivered", 400);
+        }
+
+        let filter: any;
+
+        if (is_paid !== undefined) {
+            filter = {
+                is_paid: is_paid,
+            };
+        } else if (is_delivered !== undefined) {
+            filter = {
+                is_delivered: is_delivered,
+            };
+        }
+
         const invoice: IInvoice | null = await Invoice.findByIdAndUpdate(
             req.params.id,
-            { is_delivered: req.body.is_delivered }
+            filter
         );
 
         res.status(200).json({
@@ -157,7 +197,7 @@ export const createInvoice = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { _id } = (req as any).user;
 
-        const method: string = req.params.method;
+        const method = req.query.method;
 
         const cart: ICart | null = await Cart.findOne({
             user_id: _id,
@@ -176,6 +216,7 @@ export const createInvoice = asyncHandler(
             invoice_receiver_code: randomText,
             cart_id: cart._id,
             user_id: _id,
+            method: method,
         });
 
         if (method === "qpay") {

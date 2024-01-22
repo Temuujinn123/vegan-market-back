@@ -11,6 +11,7 @@ export interface IInvoice extends mongoose.Document {
     is_delivered: boolean;
     is_cancelled: boolean;
     is_refunded: boolean;
+    method: "qpay" | "transfer";
     created_at: Date;
     updated_at: Date;
 }

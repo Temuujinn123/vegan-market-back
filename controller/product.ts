@@ -8,7 +8,6 @@ import Category from "../models/Category";
 import { ICategory } from "../types/category";
 import asyncHandler from "../middleware/asyncHandler";
 import Files from "../models/Files";
-import { IFiles } from "../types/files";
 
 export const getCategoryProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -30,6 +29,12 @@ export const getCategoryProducts = asyncHandler(
             is_deleted: false,
         };
 
+        if (category.length !== 0) {
+            filter.category = {
+                $in: category,
+            };
+        }
+
         if (is_sale) {
             (filter.is_sale = Boolean(is_sale)),
                 (filter.sale_start_date = {
@@ -40,6 +45,14 @@ export const getCategoryProducts = asyncHandler(
             };
         }
 
+        const nameRegex = new RegExp(search as string, "i");
+
+        if (nameRegex) {
+            filter.name = {
+                $regex: nameRegex,
+            };
+        }
+
         const pagination = await Pagintate(
             page as number,
             limit as number,
@@ -47,40 +60,18 @@ export const getCategoryProducts = asyncHandler(
             filter
         );
 
-        const nameRegex = new RegExp(search as string, "i");
-
-        let products;
-
-        if (category.length !== 0) {
-            products = await Product.find(
-                {
-                    name: { $regex: nameRegex },
-                    category: { $in: category },
-                    ...filter,
-                },
-                select
-            )
-                .populate(["category", "img"])
-                .sort(sort as string)
-                .skip(pagination.start - 1)
-                .limit(limit as number)
-                .where("is_deleted")
-                .equals(false);
-        } else {
-            products = await Product.find(
-                {
-                    name: { $regex: nameRegex },
-                    ...filter,
-                },
-                select
-            )
-                .populate(["category", "img"])
-                .sort(sort as string)
-                .skip(pagination.start - 1)
-                .limit(limit as number)
-                .where("is_deleted")
-                .equals(false);
-        }
+        const products = await Product.find(
+            {
+                ...filter,
+            },
+            select
+        )
+            .populate(["category", "img"])
+            .sort(sort as string)
+            .skip(pagination.start - 1)
+            .limit(limit as number)
+            .where("is_deleted")
+            .equals(false);
 
         res.status(200).json({
             success: true,
