@@ -1,2 +1,11 @@
-[service.http]
-  publicDir = "public/upload"
+version = 2
+services = [
+  {
+    publicDir = "public"
+  }
+]
+
+# This service will be served on the root URL (/)
+[services.default]
+entrypoint = "npm start"
+port = 5000
