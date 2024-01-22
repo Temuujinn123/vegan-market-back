@@ -2,7 +2,8 @@
   "service": {
     "http": {
       "internal_port": 5000,
-      "publicDir": "public/upload"
+      "publicDir": "public",
+      "staticDir": "public"
     }
   }
 }
