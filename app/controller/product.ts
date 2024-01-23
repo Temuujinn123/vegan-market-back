@@ -247,6 +247,7 @@ export const uploadProductPhoto = asyncHandler(
         console.log(`${process.env.FILE_UPLOAD_PATH}/${files.name}`);
 
         files.mv(`../../public/upload/${files.name}`, async (err: Error) => {
+            console.log("=========> ", err);
             if (err) throw new MyError(err.message, 400);
 
             await Files.create({
