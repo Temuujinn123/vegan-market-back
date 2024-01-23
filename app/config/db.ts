@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import path from "path";
 
 const connectDB = async () => {
     const mongodb_uri =
@@ -7,6 +8,10 @@ const connectDB = async () => {
             : process.env.MONGODB_URI;
 
     const conn = await mongoose.connect(mongodb_uri ?? "", {});
+
+    const publicDirectoryPath = path.join(__dirname, "../public/upload");
+
+    console.log(publicDirectoryPath);
 
     console.log(`MongoDB connected: ${conn.connection.host}`);
 };
