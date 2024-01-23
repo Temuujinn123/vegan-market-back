@@ -9,7 +9,7 @@ const connectDB = async () => {
 
     const conn = await mongoose.connect(mongodb_uri ?? "", {});
 
-    const publicDirectoryPath = path.join(__dirname, "../public/upload");
+    const publicDirectoryPath = path.join(__dirname, "../../public/upload");
 
     console.log(publicDirectoryPath);
 
