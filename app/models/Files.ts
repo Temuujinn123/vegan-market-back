@@ -5,10 +5,9 @@ const FilesSchema = new mongoose.Schema<IFiles>(
     {
         name: {
             type: String,
-            required: [true, "Insert category name..."],
+            required: [true, "Insert file name..."],
             unique: true,
             trim: true,
-            max: [50, "Max length of category name is 50..."],
         },
         product_id: {
             type: mongoose.Schema.ObjectId,

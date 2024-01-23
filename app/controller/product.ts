@@ -183,71 +183,103 @@ export const deletePhoto = asyncHandler(
     }
 );
 
+const storage = multer.diskStorage({
+    destination: "../public/upload/",
+    filename: (req, file, cb) => {
+        console.log("============>", file);
+        file.filename = `photo-${Date.now()}-${file.originalname}`;
+        cb(null, file.filename);
+    },
+});
+
+const upload = multer({ storage: storage });
+
+export const uploadImage = upload.single("file");
+
 export const uploadProductPhoto = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const uploadedFile = req.file;
+        const { filename }: any = req.file;
 
-        const product: IProduct | null = await Product.findById(req.params.id);
+        console.log("==========> filename: ", filename);
 
-        // Check if a file was uploaded
-        if (!uploadedFile) {
-            return res.status(400).json({ error: "No file uploaded." });
-        }
-
-        // Display the file details
-        const filePath = path.join(
-            __dirname,
-            "../public/upload",
-            uploadedFile.filename
-        );
-        console.log("File saved at:", filePath);
-
-        await Files.create({
-            name: uploadedFile.filename,
-            product_id: product?._id,
+        // Save the file path to MongoDB
+        const imagePath = path.join("public/upload", filename);
+        const file = await Files.create({
+            name: filename,
+            product_id: req.params.id,
         });
 
-        // You can save the file information to a database or perform other actions as needed
-
-        // Respond to the client
         res.status(200).json({
             success: true,
-            message: "File uploaded successfully.",
-            file: uploadedFile,
         });
+        // const file = req?.files?.file;
+        // // const product: IProduct | null = await Product.findById(req.params.id);
 
+        // if (file === undefined) throw new MyError("File is required", 400);
+
+        // if (Array.isArray(file))
+        //     throw new MyError("Only one file is required", 400);
+
+        // const newFile = await Files.create({
+        //     name: file.name,
+        //     data: file.data,
+        //     product_id: req.params.id,
+        // });
+
+        // res.status(200).json({
+        //     success: true,
+        //     data: newFile,
+        // });
+
+        // const uploadedFile = req.file;
+        // console.log("🚀 ~ uploadedFile:", uploadedFile);
+        // const product: IProduct | null = await Product.findById(req.params.id);
+        // // Check if a file was uploaded
+        // if (!uploadedFile) {
+        //     return res.status(400).json({ error: "No file uploaded." });
+        // }
+        // // Display the file details
+        // const filePath = path.join(
+        //     __dirname,
+        //     "../public/upload",
+        //     uploadedFile.filename
+        // );
+        // console.log("File saved at:", filePath);
+        // await Files.create({
+        //     name: uploadedFile.filename,
+        //     product_id: product?._id,
+        // });
+        // // You can save the file information to a database or perform other actions as needed
+        // // Respond to the client
+        // res.status(200).json({
+        //     success: true,
+        //     message: "File uploaded successfully.",
+        //     file: uploadedFile,
+        // });
+        // ============================================================================================
         // if (!product)
         //     throw new MyError(req.params.id + " boook not found...", 404);
-
         // // image upload
-
         // const files = req?.files?.file as UploadedFile[];
-
         // console.log("file size =====>", files);
-
         // if (files === undefined)
         //     throw new MyError("Please upload file...", 400);
-
         // if (Array.isArray(files)) {
         //     for (const file of files) {
         //         if (!file.mimetype?.startsWith("image"))
         //             throw new MyError("Please upload image file...", 400);
-
         //         if (
         //             process.env.MAX_UPLOAD_FILE_SIZE &&
         //             file.size > +process.env.MAX_UPLOAD_FILE_SIZE
         //         )
         //             throw new MyError("Your image's size is too big...", 400);
-
         //         file.name = `photo_${req.params.id}${new Date().getTime()}${
         //             path.parse(file.name).ext
         //         }`;
-
         //         file.mv(
         //             `${process.env.FILE_UPLOAD_PATH}/${file.name}`,
         //             async (err: Error) => {
         //                 if (err) throw new MyError(err.message, 400);
-
         //                 await Files.create({
         //                     name: file.name,
         //                     product_id: product._id,
@@ -255,36 +287,28 @@ export const uploadProductPhoto = asyncHandler(
         //             }
         //         );
         //     }
-
         //     return res.status(200).json({
         //         success: true,
         //     });
         // }
-
         // if (!files.mimetype?.startsWith("image"))
         //     throw new MyError("Please upload image file...", 400);
-
         // if (
         //     process.env.MAX_UPLOAD_FILE_SIZE &&
         //     files.size > +process.env.MAX_UPLOAD_FILE_SIZE
         // )
         //     throw new MyError("Your image's size is too big...", 400);
-
         // files.name = `photo_${req.params.id}${new Date().getTime()}${
         //     path.parse(files.name).ext
         // }`;
-
         // console.log(`${process.env.FILE_UPLOAD_PATH}/${files.name}`);
-
         // files.mv(`../../public/upload/${files.name}`, async (err: Error) => {
         //     console.log("=========> ", err);
         //     if (err) throw new MyError(err.message, 400);
-
         //     await Files.create({
         //         name: files.name,
         //         product_id: product._id,
         //     });
-
         //     res.status(200).json({
         //         success: true,
         //     });
