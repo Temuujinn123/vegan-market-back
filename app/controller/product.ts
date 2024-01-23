@@ -8,6 +8,7 @@ import Category from "../models/Category";
 import { ICategory } from "../types/category";
 import asyncHandler from "../middleware/asyncHandler";
 import Files from "../models/Files";
+import multer from "multer";
 
 export const getCategoryProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -184,80 +185,109 @@ export const deletePhoto = asyncHandler(
 
 export const uploadProductPhoto = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
+        const uploadedFile = req.file;
+
         const product: IProduct | null = await Product.findById(req.params.id);
 
-        if (!product)
-            throw new MyError(req.params.id + " boook not found...", 404);
-
-        // image upload
-
-        const files = req?.files?.file;
-
-        console.log("file size =====>", files);
-
-        if (files === undefined)
-            throw new MyError("Please upload file...", 400);
-
-        if (Array.isArray(files)) {
-            for (const file of files) {
-                if (!file.mimetype?.startsWith("image"))
-                    throw new MyError("Please upload image file...", 400);
-
-                if (
-                    process.env.MAX_UPLOAD_FILE_SIZE &&
-                    file.size > +process.env.MAX_UPLOAD_FILE_SIZE
-                )
-                    throw new MyError("Your image's size is too big...", 400);
-
-                file.name = `photo_${req.params.id}${new Date().getTime()}${
-                    path.parse(file.name).ext
-                }`;
-
-                file.mv(
-                    `${process.env.FILE_UPLOAD_PATH}/${file.name}`,
-                    async (err: Error) => {
-                        if (err) throw new MyError(err.message, 400);
-
-                        await Files.create({
-                            name: file.name,
-                            product_id: product._id,
-                        });
-                    }
-                );
-            }
-
-            return res.status(200).json({
-                success: true,
-            });
+        // Check if a file was uploaded
+        if (!uploadedFile) {
+            return res.status(400).json({ error: "No file uploaded." });
         }
 
-        if (!files.mimetype?.startsWith("image"))
-            throw new MyError("Please upload image file...", 400);
+        // Display the file details
+        const filePath = path.join(
+            __dirname,
+            "../public/upload",
+            uploadedFile.filename
+        );
+        console.log("File saved at:", filePath);
 
-        if (
-            process.env.MAX_UPLOAD_FILE_SIZE &&
-            files.size > +process.env.MAX_UPLOAD_FILE_SIZE
-        )
-            throw new MyError("Your image's size is too big...", 400);
-
-        files.name = `photo_${req.params.id}${new Date().getTime()}${
-            path.parse(files.name).ext
-        }`;
-
-        console.log(`${process.env.FILE_UPLOAD_PATH}/${files.name}`);
-
-        files.mv(`../../public/upload/${files.name}`, async (err: Error) => {
-            console.log("=========> ", err);
-            if (err) throw new MyError(err.message, 400);
-
-            await Files.create({
-                name: files.name,
-                product_id: product._id,
-            });
-
-            res.status(200).json({
-                success: true,
-            });
+        await Files.create({
+            name: uploadedFile.filename,
+            product_id: product?._id,
         });
+
+        // You can save the file information to a database or perform other actions as needed
+
+        // Respond to the client
+        res.status(200).json({
+            success: true,
+            message: "File uploaded successfully.",
+            file: uploadedFile,
+        });
+
+        // if (!product)
+        //     throw new MyError(req.params.id + " boook not found...", 404);
+
+        // // image upload
+
+        // const files = req?.files?.file as UploadedFile[];
+
+        // console.log("file size =====>", files);
+
+        // if (files === undefined)
+        //     throw new MyError("Please upload file...", 400);
+
+        // if (Array.isArray(files)) {
+        //     for (const file of files) {
+        //         if (!file.mimetype?.startsWith("image"))
+        //             throw new MyError("Please upload image file...", 400);
+
+        //         if (
+        //             process.env.MAX_UPLOAD_FILE_SIZE &&
+        //             file.size > +process.env.MAX_UPLOAD_FILE_SIZE
+        //         )
+        //             throw new MyError("Your image's size is too big...", 400);
+
+        //         file.name = `photo_${req.params.id}${new Date().getTime()}${
+        //             path.parse(file.name).ext
+        //         }`;
+
+        //         file.mv(
+        //             `${process.env.FILE_UPLOAD_PATH}/${file.name}`,
+        //             async (err: Error) => {
+        //                 if (err) throw new MyError(err.message, 400);
+
+        //                 await Files.create({
+        //                     name: file.name,
+        //                     product_id: product._id,
+        //                 });
+        //             }
+        //         );
+        //     }
+
+        //     return res.status(200).json({
+        //         success: true,
+        //     });
+        // }
+
+        // if (!files.mimetype?.startsWith("image"))
+        //     throw new MyError("Please upload image file...", 400);
+
+        // if (
+        //     process.env.MAX_UPLOAD_FILE_SIZE &&
+        //     files.size > +process.env.MAX_UPLOAD_FILE_SIZE
+        // )
+        //     throw new MyError("Your image's size is too big...", 400);
+
+        // files.name = `photo_${req.params.id}${new Date().getTime()}${
+        //     path.parse(files.name).ext
+        // }`;
+
+        // console.log(`${process.env.FILE_UPLOAD_PATH}/${files.name}`);
+
+        // files.mv(`../../public/upload/${files.name}`, async (err: Error) => {
+        //     console.log("=========> ", err);
+        //     if (err) throw new MyError(err.message, 400);
+
+        //     await Files.create({
+        //         name: files.name,
+        //         product_id: product._id,
+        //     });
+
+        //     res.status(200).json({
+        //         success: true,
+        //     });
+        // });
     }
 );
