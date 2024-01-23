@@ -41,7 +41,6 @@ app.use(
 // Serve uploaded images
 app.use("/upload", express.static("../public/upload"));
 
-//
 // routers
 app.use("/api/v1/products", cors(), productRouter);
 app.use("/api/v1/categories", cors(), categoryRouter);
