@@ -4,8 +4,8 @@
   "description": "",
   "main": "server.ts",
   "scripts": {
-    "start": "NODE_ENV=production node ./app/server",
-    "dev": "nodemon ./app/server.ts",
+    "start": "NODE_ENV=production node server",
+    "dev": "nodemon ./server.ts",
     "tsc": "tsc"
   },
   "author": "",
