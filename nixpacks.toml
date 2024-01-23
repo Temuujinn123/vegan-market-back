@@ -1,4 +1,0 @@
-[build]
-  [build.nixpacks]
-    provider = "node"
-    build-args = "--exclude-dir=./public"
