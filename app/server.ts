@@ -6,8 +6,6 @@ import errorHandler from "./middleware/error";
 import productRouter from "./routes/product";
 import categoryRouter from "./routes/category";
 import adminUserRouter from "./routes/adminUser";
-import compression from "compression";
-import limiter from "express-rate-limit";
 import userRouter from "./routes/user";
 import wishlistRouter from "./routes/wishlist";
 import cartRouter from "./routes/cart";
