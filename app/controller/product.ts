@@ -195,67 +195,66 @@ export const uploadProductPhoto = asyncHandler(
 
         console.log("file size =====>", files);
 
-        if (files?.name) {
-            console.log("----------------->");
-            if (!(files as any).mimetype?.startsWith("image"))
-                throw new MyError("Please upload image file...", 400);
+        if (Array.isArray(files)) {
+            for (const file of files) {
+                if (!(file as any).mimetype?.startsWith("image"))
+                    throw new MyError("Please upload image file...", 400);
 
-            if (
-                process.env.MAX_UPLOAD_FILE_SIZE &&
-                (files as any).size > process.env.MAX_UPLOAD_FILE_SIZE
-            )
-                throw new MyError("Your image's size is too big...", 400);
+                if (
+                    process.env.MAX_UPLOAD_FILE_SIZE &&
+                    (file as any).size > process.env.MAX_UPLOAD_FILE_SIZE
+                )
+                    throw new MyError("Your image's size is too big...", 400);
 
-            (files as any).name = `photo_${
-                req.params.id
-            }${new Date().getTime()}${path.parse((files as any).name).ext}`;
+                (file as any).name = `photo_${
+                    req.params.id
+                }${new Date().getTime()}${path.parse((file as any).name).ext}`;
 
-            (files as any).mv(
-                `${process.env.FILE_UPLOAD_PATH}/${(files as any).name}`,
-                async (err: Error) => {
-                    if (err) throw new MyError(err.message, 400);
+                (file as any).mv(
+                    `${process.env.FILE_UPLOAD_PATH}/${(file as any).name}`,
+                    async (err: Error) => {
+                        if (err) throw new MyError(err.message, 400);
 
-                    await Files.create({
-                        name: (files as any).name,
-                        product_id: product._id,
-                    });
+                        await Files.create({
+                            name: (file as any).name,
+                            product_id: product._id,
+                        });
+                    }
+                );
+            }
 
-                    return res.status(200).json({
-                        success: true,
-                    });
-                }
-            );
+            return res.status(200).json({
+                success: true,
+            });
         }
 
-        for (const file of files) {
-            if (!(file as any).mimetype?.startsWith("image"))
-                throw new MyError("Please upload image file...", 400);
+        if (!(files as any).mimetype?.startsWith("image"))
+            throw new MyError("Please upload image file...", 400);
 
-            if (
-                process.env.MAX_UPLOAD_FILE_SIZE &&
-                (file as any).size > process.env.MAX_UPLOAD_FILE_SIZE
-            )
-                throw new MyError("Your image's size is too big...", 400);
+        if (
+            process.env.MAX_UPLOAD_FILE_SIZE &&
+            (files as any).size > process.env.MAX_UPLOAD_FILE_SIZE
+        )
+            throw new MyError("Your image's size is too big...", 400);
 
-            (file as any).name = `photo_${
-                req.params.id
-            }${new Date().getTime()}${path.parse((file as any).name).ext}`;
+        (files as any).name = `photo_${req.params.id}${new Date().getTime()}${
+            path.parse((files as any).name).ext
+        }`;
 
-            (file as any).mv(
-                `${process.env.FILE_UPLOAD_PATH}/${(file as any).name}`,
-                async (err: Error) => {
-                    if (err) throw new MyError(err.message, 400);
+        (files as any).mv(
+            `${process.env.FILE_UPLOAD_PATH}/${(files as any).name}`,
+            async (err: Error) => {
+                if (err) throw new MyError(err.message, 400);
 
-                    await Files.create({
-                        name: (file as any).name,
-                        product_id: product._id,
-                    });
-                }
-            );
-        }
+                await Files.create({
+                    name: (files as any).name,
+                    product_id: product._id,
+                });
 
-        res.status(200).json({
-            success: true,
-        });
+                res.status(200).json({
+                    success: true,
+                });
+            }
+        );
     }
 );
