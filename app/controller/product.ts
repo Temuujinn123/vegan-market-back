@@ -191,32 +191,35 @@ export const uploadProductPhoto = asyncHandler(
 
         // image upload
 
-        const files = (req as any).files.file;
+        const files = req?.files?.file;
 
         console.log("file size =====>", files);
 
+        if (files === undefined)
+            throw new MyError("Please upload file...", 400);
+
         if (Array.isArray(files)) {
             for (const file of files) {
-                if (!(file as any).mimetype?.startsWith("image"))
+                if (!file.mimetype?.startsWith("image"))
                     throw new MyError("Please upload image file...", 400);
 
                 if (
                     process.env.MAX_UPLOAD_FILE_SIZE &&
-                    (file as any).size > process.env.MAX_UPLOAD_FILE_SIZE
+                    file.size > +process.env.MAX_UPLOAD_FILE_SIZE
                 )
                     throw new MyError("Your image's size is too big...", 400);
 
-                (file as any).name = `photo_${
-                    req.params.id
-                }${new Date().getTime()}${path.parse((file as any).name).ext}`;
+                file.name = `photo_${req.params.id}${new Date().getTime()}${
+                    path.parse(file.name).ext
+                }`;
 
-                (file as any).mv(
-                    `${process.env.FILE_UPLOAD_PATH}/${(file as any).name}`,
+                file.mv(
+                    `${process.env.FILE_UPLOAD_PATH}/${file.name}`,
                     async (err: Error) => {
                         if (err) throw new MyError(err.message, 400);
 
                         await Files.create({
-                            name: (file as any).name,
+                            name: file.name,
                             product_id: product._id,
                         });
                     }
@@ -228,35 +231,32 @@ export const uploadProductPhoto = asyncHandler(
             });
         }
 
-        if (!(files as any).mimetype?.startsWith("image"))
+        if (!files.mimetype?.startsWith("image"))
             throw new MyError("Please upload image file...", 400);
 
         if (
             process.env.MAX_UPLOAD_FILE_SIZE &&
-            (files as any).size > process.env.MAX_UPLOAD_FILE_SIZE
+            files.size > +process.env.MAX_UPLOAD_FILE_SIZE
         )
             throw new MyError("Your image's size is too big...", 400);
 
-        (files as any).name = `photo_${req.params.id}${new Date().getTime()}${
-            path.parse((files as any).name).ext
+        files.name = `photo_${req.params.id}${new Date().getTime()}${
+            path.parse(files.name).ext
         }`;
 
-        console.log(`${process.env.FILE_UPLOAD_PATH}/${(files as any).name}`);
+        console.log(`${process.env.FILE_UPLOAD_PATH}/${files.name}`);
 
-        (files as any).mv(
-            `../../public/upload/${(files as any).name}`,
-            async (err: Error) => {
-                if (err) throw new MyError(err.message, 400);
+        files.mv(`../../public/upload/${files.name}`, async (err: Error) => {
+            if (err) throw new MyError(err.message, 400);
 
-                await Files.create({
-                    name: (files as any).name,
-                    product_id: product._id,
-                });
+            await Files.create({
+                name: files.name,
+                product_id: product._id,
+            });
 
-                res.status(200).json({
-                    success: true,
-                });
-            }
-        );
+            res.status(200).json({
+                success: true,
+            });
+        });
     }
 );
