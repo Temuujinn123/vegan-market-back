@@ -36,6 +36,8 @@ app.use(
     })
 );
 
+//
+
 // Serve uploaded images
 app.use("/upload", express.static("../public/upload"));
 
