@@ -8,7 +8,7 @@ import Category from "../models/Category";
 import { ICategory } from "../types/category";
 import asyncHandler from "../middleware/asyncHandler";
 import Files from "../models/Files";
-import multer from "multer";
+import uploadImageToCloudinary from "../utils/uploadCloudinary";
 
 export const getCategoryProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -183,78 +183,51 @@ export const deletePhoto = asyncHandler(
     }
 );
 
-const storage = multer.diskStorage({
-    destination: "../public/upload/",
-    filename: (req, file, cb) => {
-        console.log("============>", file);
-        file.filename = `photo-${Date.now()}-${file.originalname}`;
-        cb(null, file.filename);
-    },
-});
-
-const upload = multer({ storage: storage });
-
-export const uploadImage = upload.single("file");
-
 export const uploadProductPhoto = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const { filename }: any = req.file;
+        const product: IProduct | null = await Product.findById(req.params.id);
 
-        console.log("==========> filename: ", filename);
+        if (!product)
+            throw new MyError(req.params.id + " boook not found...", 404);
 
-        // Save the file path to MongoDB
-        const imagePath = path.join("public/upload", filename);
-        const file = await Files.create({
-            name: filename,
-            product_id: req.params.id,
+        const file = req.files?.file;
+
+        console.log(file);
+
+        if (!file || Array.isArray(file))
+            throw new MyError("Please upload file...", 400);
+
+        if (!file.mimetype?.startsWith("image"))
+            throw new MyError("Please upload image file...", 400);
+
+        file.name = `photo_${req.params.id}${new Date().getTime()}${
+            path.parse(file.name).ext
+        }`;
+
+        file.mv(`./public/upload/${file.name}`, async (err: Error) => {
+            console.log("=========> ", err);
+            if (err) throw new MyError(err.message, 400);
+
+            const result = await uploadImageToCloudinary(file.name);
+            console.log("🚀 ~ result:", result);
+
+            await Files.create({
+                name: file.name,
+                url: result,
+                product_id: product._id,
+            });
+            res.status(200).json({
+                success: true,
+            });
         });
 
-        res.status(200).json({
-            success: true,
-        });
-        // const file = req?.files?.file;
-        // // const product: IProduct | null = await Product.findById(req.params.id);
-
-        // if (file === undefined) throw new MyError("File is required", 400);
-
-        // if (Array.isArray(file))
-        //     throw new MyError("Only one file is required", 400);
-
-        // const newFile = await Files.create({
+        // await Files.create({
         //     name: file.name,
-        //     data: file.data,
         //     product_id: req.params.id,
         // });
 
         // res.status(200).json({
         //     success: true,
-        //     data: newFile,
-        // });
-
-        // const uploadedFile = req.file;
-        // console.log("🚀 ~ uploadedFile:", uploadedFile);
-        // const product: IProduct | null = await Product.findById(req.params.id);
-        // // Check if a file was uploaded
-        // if (!uploadedFile) {
-        //     return res.status(400).json({ error: "No file uploaded." });
-        // }
-        // // Display the file details
-        // const filePath = path.join(
-        //     __dirname,
-        //     "../public/upload",
-        //     uploadedFile.filename
-        // );
-        // console.log("File saved at:", filePath);
-        // await Files.create({
-        //     name: uploadedFile.filename,
-        //     product_id: product?._id,
-        // });
-        // // You can save the file information to a database or perform other actions as needed
-        // // Respond to the client
-        // res.status(200).json({
-        //     success: true,
-        //     message: "File uploaded successfully.",
-        //     file: uploadedFile,
         // });
         // ============================================================================================
         // if (!product)
@@ -315,3 +288,77 @@ export const uploadProductPhoto = asyncHandler(
         // });
     }
 );
+
+// const product: IProduct | null = await Product.findById(req.params.id);
+
+//         if (!product)
+//             throw new MyError(req.params.id + " boook not found...", 404);
+
+//         // image upload
+
+//         const files = (req as any).files.file;
+
+//         console.log("file size =====>", files);
+
+//         if (files?.name) {
+//             console.log("----------------->");
+//             if (!(files as any).mimetype?.startsWith("image"))
+//                 throw new MyError("Please upload image file...", 400);
+
+//             if (
+//                 process.env.MAX_UPLOAD_FILE_SIZE &&
+//                 (files as any).size > process.env.MAX_UPLOAD_FILE_SIZE
+//             )
+//                 throw new MyError("Your image's size is too big...", 400);
+
+//             (files as any).name = `photo_${
+//                 req.params.id
+//             }${new Date().getTime()}${path.parse((files as any).name).ext}`;
+
+//             (files as any).mv(
+//                 `${process.env.FILE_UPLOAD_PATH}/${(files as any).name}`,
+//                 async (err: Error) => {
+//                     if (err) throw new MyError(err.message, 400);
+
+//                     await Files.create({
+//                         name: (files as any).name,
+//                         product_id: product._id,
+//                     });
+
+//                     return res.status(200).json({
+//                         success: true,
+//                     });
+//                 }
+//             );
+//         }
+
+//         for (const file of files) {
+//             if (!(file as any).mimetype?.startsWith("image"))
+//                 throw new MyError("Please upload image file...", 400);
+
+//             if (
+//                 process.env.MAX_UPLOAD_FILE_SIZE &&
+//                 (file as any).size > process.env.MAX_UPLOAD_FILE_SIZE
+//             )
+//                 throw new MyError("Your image's size is too big...", 400);
+
+//             (file as any).name = `photo_${
+//                 req.params.id
+//             }${new Date().getTime()}${path.parse((file as any).name).ext}`;
+
+//             (file as any).mv(
+//                 `${process.env.FILE_UPLOAD_PATH}/${(file as any).name}`,
+//                 async (err: Error) => {
+//                     if (err) throw new MyError(err.message, 400);
+
+//                     await Files.create({
+//                         name: (file as any).name,
+//                         product_id: product._id,
+//                     });
+//                 }
+//             );
+//         }
+
+//         res.status(200).json({
+//             success: true,
+//         });

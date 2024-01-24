@@ -7,7 +7,6 @@ import {
     getProduct,
     lastProducts,
     updateProduct,
-    uploadImage,
     uploadProductPhoto,
 } from "../controller/product";
 import { protect } from "../middleware/protect";
@@ -16,6 +15,7 @@ import bodyparser from "body-parser";
 const productRouter = express.Router({ mergeParams: true });
 
 const jsonParser = bodyparser.json();
+const urlencoded = bodyparser.urlencoded({ extended: true });
 
 productRouter
     .route("/")
@@ -30,9 +30,7 @@ productRouter
 
 productRouter.route("/last/products").get(lastProducts);
 
-productRouter
-    .route("/:id/photo")
-    .post(protect, uploadImage, uploadProductPhoto);
+productRouter.route("/:id/photo").post(protect, jsonParser, uploadProductPhoto);
 
 productRouter.route("/photo/:id").delete(protect, deletePhoto);
 

@@ -12,6 +12,8 @@ import cartRouter from "./routes/cart";
 import filesRouter from "./routes/files";
 import invoiceRouter from "./routes/invoice";
 import bannerFilesRouter from "./routes/bannerFiles";
+import { v2 as cloudinary } from "cloudinary";
+import fileupload from "express-fileupload";
 
 dotenv.config({
     path: "./config/config.env",
@@ -22,6 +24,12 @@ connectDB();
 const app = express();
 
 const port = process.env.PORT;
+
+cloudinary.config({
+    cloud_name: "dztapoxdr",
+    api_key: "828683243165131",
+    api_secret: "jlkH5cFuGfN2k53cgDJMv3G1ZN0",
+});
 
 // app.use(compression());
 // app.use(limiter);
@@ -36,7 +44,7 @@ app.use(
     })
 );
 
-//
+app.use(fileupload());
 
 // Serve uploaded images
 app.use("/upload", express.static("../public/upload"));
@@ -51,16 +59,6 @@ app.use("/api/v1/cart", cors(), cartRouter);
 app.use("/api/v1/files", cors(), filesRouter);
 app.use("/api/v1/invoice", cors(), invoiceRouter);
 app.use("/api/v1/banner", cors(), bannerFilesRouter);
-
-app.post(
-    "/auth/google/callback",
-    async (req: Request, res: Response, next: NextFunction) => {
-        console.log("========================> ", req.body);
-        res.status(200).json({
-            success: true,
-        });
-    }
-);
 
 app.use(errorHandler);
 

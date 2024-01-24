@@ -9,6 +9,12 @@ const FilesSchema = new mongoose.Schema<IFiles>(
             unique: true,
             trim: true,
         },
+        url: {
+            type: String,
+            required: [false, "Insert file url..."],
+            unique: true,
+            trim: true,
+        },
         product_id: {
             type: mongoose.Schema.ObjectId,
             ref: "Product",
