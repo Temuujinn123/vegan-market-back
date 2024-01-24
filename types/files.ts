@@ -6,4 +6,3 @@ export interface IFiles extends mongoose.Document {
     url: string;
     created_at: Date;
 }
-//
