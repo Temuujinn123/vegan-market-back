@@ -47,7 +47,7 @@ app.use(
 app.use(fileupload());
 
 // Serve uploaded images
-app.use("/upload", express.static("../public/upload"));
+app.use("/upload", express.static("./public/upload"));
 
 // routers
 app.use("/api/v1/products", cors(), productRouter);
