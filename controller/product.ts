@@ -190,29 +190,61 @@ export const uploadProductPhoto = asyncHandler(
         if (!product)
             throw new MyError(req.params.id + " boook not found...", 404);
 
-        const file = req.files?.file;
+        const files = req.files?.file;
 
-        console.log(file);
+        console.log(files);
 
-        if (!file || Array.isArray(file))
-            throw new MyError("Please upload file...", 400);
+        if (!files) throw new MyError("Please upload file...", 400);
 
-        if (!file.mimetype?.startsWith("image"))
+        if (Array.isArray(files)) {
+            for (const file of files) {
+                if (!file.mimetype?.startsWith("image"))
+                    throw new MyError("Please upload image file...", 400);
+                if (
+                    process.env.MAX_UPLOAD_FILE_SIZE &&
+                    file.size > +process.env.MAX_UPLOAD_FILE_SIZE
+                )
+                    throw new MyError("Your image's size is too big...", 400);
+                file.name = `photo_${req.params.id}${new Date().getTime()}${
+                    path.parse(file.name).ext
+                }`;
+                file.mv(
+                    `${process.env.FILE_UPLOAD_PATH}/${file.name}`,
+                    async (err: Error) => {
+                        if (err) throw new MyError(err.message, 400);
+
+                        const result = await uploadImageToCloudinary(file.name);
+
+                        await Files.create({
+                            name: file.name,
+                            url: result,
+                            product_id: product._id,
+                        });
+                    }
+                );
+            }
+
+            return res.status(200).json({
+                success: true,
+            });
+        }
+
+        if (!files.mimetype?.startsWith("image"))
             throw new MyError("Please upload image file...", 400);
 
-        file.name = `photo_${req.params.id}${new Date().getTime()}${
-            path.parse(file.name).ext
+        files.name = `photo_${req.params.id}${new Date().getTime()}${
+            path.parse(files.name).ext
         }`;
 
-        file.mv(`./public/upload/${file.name}`, async (err: Error) => {
+        files.mv(`./public/upload/${files.name}`, async (err: Error) => {
             console.log("=========> ", err);
             if (err) throw new MyError(err.message, 400);
 
-            const result = await uploadImageToCloudinary(file.name);
+            const result = await uploadImageToCloudinary(files.name);
             console.log("🚀 ~ result:", result);
 
             await Files.create({
-                name: file.name,
+                name: files.name,
                 url: result,
                 product_id: product._id,
             });
