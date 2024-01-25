@@ -5,7 +5,7 @@ const NotificationSchema = new mongoose.Schema<INotification>({
     user_id: {
         type: mongoose.Schema.ObjectId,
         ref: "User",
-        required: true,
+        required: false,
     },
     content: {
         type: String,
@@ -18,6 +18,10 @@ const NotificationSchema = new mongoose.Schema<INotification>({
     url: {
         type: String,
         required: false,
+    },
+    type: {
+        type: String,
+        required: true,
     },
     updated_at: {
         type: Date,

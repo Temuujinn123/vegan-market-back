@@ -6,8 +6,8 @@ import MyError from "../utils/myError";
 export const getNotifications = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const notifications = await Noitfication.find({
-            user_id: (req as any).user._id,
-        });
+            $or: [{ user_id: (req as any).user._id }, { type: "all" }],
+        }).sort({ created_at: -1 });
 
         res.status(200).json({
             success: true,
