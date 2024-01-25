@@ -11,6 +11,7 @@ import {
 } from "../utils/generateRandom";
 import axios from "axios";
 import Pagintate from "../utils/paginate";
+import Noitfication from "../models/Noitfication";
 
 export const getInvoices = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -152,6 +153,14 @@ export const updateInvoice = asyncHandler(
             filter
         );
 
+        if (is_paid) {
+            await Noitfication.create({
+                user_id: invoice?.user_id,
+                url: "/profile/history",
+                content: "Таны захиалга амжилттай баталгаажлаа.",
+            });
+        }
+
         res.status(200).json({
             success: true,
             data: invoice,
@@ -185,6 +194,12 @@ export const confirmInvoicePayment = asyncHandler(
 
         await Cart.create({
             user_id,
+        });
+
+        await Noitfication.create({
+            user_id: user_id,
+            url: "/profile/history",
+            content: "Таны захиалга амжилттай баталгаажлаа.",
         });
 
         res.status(200).json({

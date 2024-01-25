@@ -14,6 +14,7 @@ import invoiceRouter from "./routes/invoice";
 import bannerFilesRouter from "./routes/bannerFiles";
 import { v2 as cloudinary } from "cloudinary";
 import fileupload from "express-fileupload";
+import notificationRouter from "./routes/notification";
 
 dotenv.config({
     path: "./config/config.env",
@@ -59,6 +60,7 @@ app.use("/api/v1/cart", cors(), cartRouter);
 app.use("/api/v1/files", cors(), filesRouter);
 app.use("/api/v1/invoice", cors(), invoiceRouter);
 app.use("/api/v1/banner", cors(), bannerFilesRouter);
+app.use("/api/v1/notifications", cors(), notificationRouter);
 
 app.use(errorHandler);
 
