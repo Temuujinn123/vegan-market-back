@@ -6,7 +6,7 @@ const ProductSchema = new mongoose.Schema<IProduct>(
         name: {
             type: String,
             required: [true, "Insert your product name..."],
-            unique: true,
+            unique: false,
             trim: true,
             max: [250, "Max length of product name is 250..."],
         },
