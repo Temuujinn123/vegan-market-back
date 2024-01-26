@@ -40,6 +40,8 @@ app.use(
         origin: [
             "http://localhost:3000",
             "https://vegan-market-front.vercel.app",
+            "https://www.e-veganmarket.com",
+            "https://e-veganmarket.com",
         ],
         optionsSuccessStatus: 200,
     })
