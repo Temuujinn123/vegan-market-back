@@ -52,6 +52,11 @@ const ProductSchema = new mongoose.Schema<IProduct>(
             ref: "Category",
             required: [true, "Insert category of the product..."],
         },
+        sub_category: {
+            type: mongoose.Schema.ObjectId,
+            ref: "SubCategory",
+            required: false,
+        },
         created_at: {
             type: Date,
             default: Date.now(),

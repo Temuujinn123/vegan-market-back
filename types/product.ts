@@ -24,6 +24,7 @@ export interface IProduct extends mongoose.Document {
     sale_end_date: Date | undefined | null;
     desc: string;
     category?: string;
+    sub_category?: string;
     created_at: Date;
     updated_at: Date | undefined | null;
     is_deleted: boolean;

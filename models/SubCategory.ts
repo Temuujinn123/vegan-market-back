@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { ICategory } from "../types/category";
+import { ISubCategory } from "../types/category";
 
-const CategorySchema = new mongoose.Schema<ICategory>(
+const SubCategorySchema = new mongoose.Schema<ISubCategory>(
     {
         name: {
             type: String,
@@ -9,6 +9,11 @@ const CategorySchema = new mongoose.Schema<ICategory>(
             unique: true,
             trim: true,
             max: [50, "Max length of category name is 50..."],
+        },
+        parent_category_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Category",
+            required: [true, "Insert parent category..."],
         },
         created_at: {
             type: Date,
@@ -28,18 +33,11 @@ const CategorySchema = new mongoose.Schema<ICategory>(
     }
 );
 
-CategorySchema.virtual("products", {
+SubCategorySchema.virtual("products", {
     ref: "Product",
     localField: "_id",
     foreignField: "category",
     justOne: false,
 });
 
-CategorySchema.virtual("sub_categories", {
-    ref: "SubCategory",
-    localField: "_id",
-    foreignField: "parent_category_id",
-    justOne: false,
-});
-
-export default mongoose.model("Category", CategorySchema);
+export default mongoose.model("SubCategory", SubCategorySchema);

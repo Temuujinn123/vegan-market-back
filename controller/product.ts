@@ -5,11 +5,12 @@ import Product from "../models/Product";
 import MyError from "../utils/myError";
 import path from "path";
 import Category from "../models/Category";
-import { ICategory } from "../types/category";
+import { ICategory, ISubCategory } from "../types/category";
 import asyncHandler from "../middleware/asyncHandler";
 import Files from "../models/Files";
 import uploadImageToCloudinary from "../utils/uploadCloudinary";
 import Noitfication from "../models/Noitfication";
+import SubCategory from "../models/SubCategory";
 
 export const getCategoryProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -20,6 +21,9 @@ export const getCategoryProducts = asyncHandler(
         const search = req.query.search || "";
         const category = req.query.category
             ? (req.query.category as string)?.split(",")
+            : [];
+        const sub_category = req.query.sub_category
+            ? (req.query.sub_category as string)?.split(",")
             : [];
         const is_sale = req.query.is_sale ?? undefined;
 
@@ -34,6 +38,12 @@ export const getCategoryProducts = asyncHandler(
         if (category.length !== 0) {
             filter.category = {
                 $in: category,
+            };
+        }
+
+        if (sub_category.length !== 0) {
+            filter.sub_category = {
+                $in: sub_category,
             };
         }
 
@@ -68,7 +78,7 @@ export const getCategoryProducts = asyncHandler(
             },
             select
         )
-            .populate(["category", "img"])
+            .populate(["category", "img", "sub_category"])
             .sort(sort as string)
             .skip(pagination.start - 1)
             .limit(limit as number)
@@ -87,7 +97,7 @@ export const getCategoryProducts = asyncHandler(
 export const lastProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const products: IProduct[] | null = await Product.find()
-            .populate(["category", "img"])
+            .populate(["category", "img", "sub_category"])
             .sort({ created_at: -1 })
             .limit(3)
             .where("is_deleted")
@@ -108,10 +118,28 @@ export const createProduct = asyncHandler(
             req.body.category
         );
 
-        if (!category)
+        const subCategory: ISubCategory | null = await SubCategory.findById(
+            req.body.category
+        );
+
+        if (!category && !subCategory)
             throw new MyError(req.body.product + " is not found...", 400);
 
-        const product: IProduct = await Product.create(req.body);
+        let product: IProduct;
+
+        if (subCategory) {
+            product = await Product.create({
+                ...req.body,
+                category: subCategory.parent_category_id,
+                sub_category: subCategory._id,
+            });
+        } else {
+            product = await Product.create({
+                ...req.body,
+                category: category?._id,
+                sub_category: null,
+            });
+        }
 
         await Noitfication.create({
             content: `${product.name} нэмэгдлээ.`,
@@ -148,14 +176,34 @@ export const createProduct = asyncHandler(
 
 export const updateProduct = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const product: IProduct | null = await Product.findByIdAndUpdate(
-            req.params.id,
-            { ...req.body, updated_at: Date.now() },
-            {
-                new: true,
-                runValidators: true,
-            }
+        const category: ICategory | null = await Category.findById(
+            req.body.category
         );
+        console.log("🚀 ~ category:", category);
+
+        const subCategory: ISubCategory | null = await SubCategory.findById(
+            req.body.category
+        );
+        console.log("🚀 ~ subCategory:", subCategory);
+
+        if (!category && !subCategory)
+            throw new MyError(req.body.category + " is not found...", 400);
+
+        let product: IProduct | null;
+
+        if (subCategory) {
+            product = await Product.findByIdAndUpdate(req.params.id, {
+                ...req.body,
+                category: subCategory.parent_category_id,
+                sub_category: subCategory._id,
+            });
+        } else {
+            product = await Product.findByIdAndUpdate(req.params.id, {
+                ...req.body,
+                category: category?._id,
+                sub_category: null,
+            });
+        }
 
         if (!product)
             throw new MyError(req.params.id + " is not found...", 404);
@@ -191,7 +239,7 @@ export const getProduct = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const product: IProduct | null = await Product.findById(
             req.params.id
-        ).populate(["category", "img"]);
+        ).populate(["category", "img", "sub_category"]);
 
         if (!product)
             throw new MyError(req.params.id + " is not found...", 400);

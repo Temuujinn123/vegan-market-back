@@ -4,6 +4,7 @@ import MyError from "../utils/myError";
 import Category from "../models/Category";
 import { ICategory } from "../types/category";
 import asyncHandler from "../middleware/asyncHandler";
+import SubCategory from "../models/SubCategory";
 
 export const getCategories = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -31,6 +32,10 @@ export const getCategories = asyncHandler(
             { name: { $regex: nameRegex } },
             select
         )
+            .populate({
+                path: "sub_categories",
+                match: { is_deleted: false },
+            })
             .sort(sort as string)
             .skip(pagination.start - 1)
             .limit(limit as number)
@@ -48,7 +53,23 @@ export const getCategories = asyncHandler(
 
 export const createCategory = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const category: ICategory = await Category.create(req.body);
+        const { name, isSubCategory, categoryId } = req.body;
+
+        if (!name) throw new MyError("Name is required...", 400);
+
+        if (isSubCategory && Boolean(isSubCategory) && categoryId) {
+            const subCategory = await SubCategory.create({
+                name,
+                parent_category_id: categoryId,
+            });
+
+            return res.status(200).json({
+                success: true,
+                data: subCategory,
+            });
+        }
+
+        const category: ICategory = await Category.create({ name });
         res.status(200).json({
             success: true,
             data: category,
