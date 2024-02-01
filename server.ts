@@ -67,8 +67,28 @@ app.use("/api/v1/notifications", cors(), notificationRouter);
 app.use(errorHandler);
 
 const server = app.listen(port, () => {
-    console.log(`Now listening on port ${port}`);
+    const address = server.address();
+    if (address && typeof address !== "string") {
+        const ipAddress = getIPAddress();
+        const serverPort = address.port;
+        console.log(`Server is running on http://${ipAddress}`);
+    }
 });
+
+export function getIPAddress(): string {
+    const ifaces = require("os").networkInterfaces();
+    let ipAddress = "";
+
+    Object.keys(ifaces).forEach((ifname) => {
+        ifaces[ifname].forEach((iface: any) => {
+            if (iface.family === "IPv4" && !iface.internal) {
+                ipAddress = `${iface.address}`;
+            }
+        });
+    });
+    const port = (server?.address() as any).port;
+    return `${ipAddress}:${port}`;
+}
 
 process.on("unhandledRejection", (err: any) => {
     console.log(`Error ===> ${err.message}`);

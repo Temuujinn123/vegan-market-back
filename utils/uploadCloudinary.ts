@@ -1,9 +1,10 @@
 import { v2 as cloudinary } from "cloudinary";
+import { getIPAddress } from "../server";
 
 const uploadImageToCloudinary = async (fileName: string) => {
     try {
         const result = await cloudinary.uploader.upload(
-            `https://vegan-market-api.up.railway.app/upload/${fileName}`,
+            `${getIPAddress()}/upload/${fileName}`,
             {
                 public_id: fileName,
             },
