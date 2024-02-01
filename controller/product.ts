@@ -11,7 +11,6 @@ import Files from "../models/Files";
 import uploadImageToCloudinary from "../utils/uploadCloudinary";
 import Noitfication from "../models/Noitfication";
 import SubCategory from "../models/SubCategory";
-import { getIPAddress } from "../server";
 
 export const getCategoryProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
