@@ -13,8 +13,9 @@ export const getCategories = asyncHandler(
         const select = req.query.select;
         const sort = req.query.sort;
         const search = req.query.search ?? "";
+        const isAll = req.query.is_all ?? false;
 
-        ["select", "sort", "page", "limit", "search"].forEach(
+        ["select", "sort", "page", "limit", "search", "is_all"].forEach(
             (el) => delete req.query[el]
         );
 
@@ -27,6 +28,26 @@ export const getCategories = asyncHandler(
         );
 
         const nameRegex = new RegExp(search as string, "i");
+
+        if (Boolean(isAll)) {
+            const categories = await Category.find(
+                { name: { $regex: nameRegex } },
+                select
+            )
+                .sort(sort as string)
+                .skip(pagination.start - 1)
+                .limit(limit as number)
+                .where("is_deleted")
+                .equals(false);
+
+            res.status(200).json({
+                success: true,
+                count: categories.length,
+                data: categories,
+                pagination,
+            });
+            return;
+        }
 
         const categories = await Category.find(
             { name: { $regex: nameRegex } },
