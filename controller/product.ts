@@ -272,20 +272,7 @@ export const deleteProduct = asyncHandler(
 
 export const deletePhoto = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const token = req?.headers?.authorization?.split(" ")[1];
-
-        if (!token) {
-            throw new MyError("Please login first.", 400);
-        }
-
-        const tokenobj = jwt.verify(token, process.env.JWT_SECRET ?? "");
-
-        const admin = await AdminUser.findById((tokenobj as any).id);
-
-        await Files.findByIdAndUpdate(req.params.id, {
-            is_deleted: true,
-            deleted_by: admin?.email,
-        });
+        await Files.findByIdAndDelete(req.params.id);
 
         res.status(200).json({
             success: true,
