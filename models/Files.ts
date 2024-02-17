@@ -20,6 +20,14 @@ const FilesSchema = new mongoose.Schema<IFiles>(
             ref: "Product",
             required: [true],
         },
+        is_deleted: {
+            type: Boolean,
+            default: false,
+        },
+        deleted_by: {
+            type: String,
+            default: null,
+        },
         created_at: {
             type: Date,
             default: Date.now(),

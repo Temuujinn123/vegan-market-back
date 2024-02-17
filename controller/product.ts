@@ -11,6 +11,8 @@ import Files from "../models/Files";
 import uploadImageToCloudinary from "../utils/uploadCloudinary";
 import Noitfication from "../models/Noitfication";
 import SubCategory from "../models/SubCategory";
+import jwt from "jsonwebtoken";
+import AdminUser from "../models/AdminUser";
 
 export const getCategoryProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -270,7 +272,20 @@ export const deleteProduct = asyncHandler(
 
 export const deletePhoto = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        await Files.findByIdAndDelete(req.params.id);
+        const token = req?.headers?.authorization?.split(" ")[1];
+
+        if (!token) {
+            throw new MyError("Please login first.", 400);
+        }
+
+        const tokenobj = jwt.verify(token, process.env.JWT_SECRET ?? "");
+
+        const admin = await AdminUser.findById((tokenobj as any).id);
+
+        await Files.findByIdAndUpdate(req.params.id, {
+            is_deleted: true,
+            deleted_by: admin?.email,
+        });
 
         res.status(200).json({
             success: true,
