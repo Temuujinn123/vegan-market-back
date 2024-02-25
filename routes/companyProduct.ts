@@ -8,32 +8,31 @@ import {
     lastProducts,
     updateProduct,
     uploadProductPhoto,
-} from "../controller/product";
-import { protect } from "../middleware/protect";
+} from "../controller/companyProduct";
 import bodyparser from "body-parser";
 import { adminProtect } from "../middleware/adminProtect";
 
-const productRouter = express.Router({ mergeParams: true });
+const companyProductRouter = express.Router({ mergeParams: true });
 
 const jsonParser = bodyparser.json();
 
-productRouter
+companyProductRouter
     .route("/")
     .get(getCategoryProducts)
     .post(adminProtect, jsonParser, createProduct);
 
-productRouter
+companyProductRouter
     .route("/:id")
     .get(getProduct)
     .delete(adminProtect, deleteProduct)
     .put(adminProtect, jsonParser, updateProduct);
 
-productRouter.route("/last/products").get(lastProducts);
+companyProductRouter.route("/last/products").get(lastProducts);
 
-productRouter
+companyProductRouter
     .route("/:id/photo")
     .post(adminProtect, jsonParser, uploadProductPhoto);
 
-productRouter.route("/photo/:id").delete(adminProtect, deletePhoto);
+companyProductRouter.route("/photo/:id").delete(adminProtect, deletePhoto);
 
-export default productRouter;
+export default companyProductRouter;

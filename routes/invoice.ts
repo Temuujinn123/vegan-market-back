@@ -8,6 +8,7 @@ import {
     getInvoices,
     updateInvoice,
 } from "../controller/invoice";
+import { adminProtect } from "../middleware/adminProtect";
 
 const invoiceRouter = express.Router();
 
@@ -18,7 +19,7 @@ invoiceRouter.route("").get(jsonParser, protect, getInvoices);
 invoiceRouter
     .route("/:id")
     .get(jsonParser, protect, getInvoice)
-    .put(jsonParser, protect, updateInvoice);
+    .put(jsonParser, adminProtect, updateInvoice);
 
 invoiceRouter.route("/create").post(jsonParser, protect, createInvoice);
 

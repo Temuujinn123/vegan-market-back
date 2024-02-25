@@ -6,22 +6,22 @@ import {
     getCategories,
     getCategory,
     updateCategory,
-} from "../controller/category";
+} from "../controller/companyCategory";
 import { adminProtect } from "../middleware/adminProtect";
 
-const categoryRouter = express.Router({ mergeParams: true });
+const companyCategoryRouter = express.Router({ mergeParams: true });
 
 const jsonParser = bodyparser.json();
 
-categoryRouter
+companyCategoryRouter
     .route("/")
     .get(getCategories)
     .post(adminProtect, jsonParser, createCategory);
 
-categoryRouter
+companyCategoryRouter
     .route("/:id")
     .get(getCategory)
     .delete(adminProtect, deleteCategory)
     .put(adminProtect, jsonParser, updateCategory);
 
-export default categoryRouter;
+export default companyCategoryRouter;

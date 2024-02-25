@@ -15,6 +15,12 @@ import bannerFilesRouter from "./routes/bannerFiles";
 import { v2 as cloudinary } from "cloudinary";
 import fileupload from "express-fileupload";
 import notificationRouter from "./routes/notification";
+import companyUserRouter from "./routes/companyUser";
+import companyCategoryRouter from "./routes/companyCategory";
+import companyProductRouter from "./routes/companyProduct";
+import companyCartRouter from "./routes/companyCart";
+import companyNotificationRouter from "./routes/companyNotification";
+import companyInvoiceRouter from "./routes/companyInvoice";
 
 dotenv.config({
     path: "./config/config.env",
@@ -63,6 +69,14 @@ app.use("/api/v1/files", cors(), filesRouter);
 app.use("/api/v1/invoice", cors(), invoiceRouter);
 app.use("/api/v1/banner", cors(), bannerFilesRouter);
 app.use("/api/v1/notifications", cors(), notificationRouter);
+
+// company routers
+app.use("/api/v1/company/user", cors(), companyUserRouter);
+app.use("/api/v1/company/categories", cors(), companyCategoryRouter);
+app.use("/api/v1/company/products", cors(), companyProductRouter);
+app.use("/api/v1/company/cart", cors(), companyCartRouter);
+app.use("/api/v1/company/notifications", cors(), companyNotificationRouter);
+app.use("/api/v1/company/invoice", cors(), companyInvoiceRouter);
 
 app.use(errorHandler);
 
