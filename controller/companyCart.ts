@@ -4,6 +4,7 @@ import MyError from "../utils/myError";
 import { ICompanyCart, ICompanyCartItem } from "../types/companyCart";
 import CompanyCart from "../models/CompanyCart";
 import CompanyCartItem from "../models/CompanyCartItem";
+import CompanyProduct from "../models/CompanyProduct";
 
 export const getCart = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -108,11 +109,46 @@ export const createCart = asyncHandler(
         const { _id } = (req as any).user;
         const { productId } = req.body;
 
-        const cart: ICompanyCart | null = await CompanyCart.findOne({
+        const product = await CompanyProduct.findById(productId);
+
+        if (!product) {
+            throw new MyError("Product not found", 400);
+        }
+
+        let cart: ICompanyCart | null = await CompanyCart.findOne({
             user_id: _id,
         })
             .where("is_bought")
             .equals(false);
+
+        if (!cart) {
+            cart = await CompanyCart.create({
+                user_id: _id,
+                total_quantity: 1,
+                total_price: product.is_sale
+                    ? product.sale_start_date &&
+                      product.sale_end_date &&
+                      new Date(product.sale_start_date) >= new Date() &&
+                      new Date(product.sale_end_date) <= new Date()
+                        ? product.sale_price
+                        : product.price
+                    : product.price,
+            });
+        } else {
+            await CompanyCart.findByIdAndUpdate(cart._id, {
+                total_quantity: cart.total_quantity + 1,
+                total_price:
+                    cart.total_price +
+                    (product.is_sale
+                        ? product.sale_start_date &&
+                          product.sale_end_date &&
+                          new Date(product.sale_start_date) >= new Date() &&
+                          new Date(product.sale_end_date) <= new Date()
+                            ? product.sale_price
+                            : product.price
+                        : product.price),
+            });
+        }
 
         const cartItem: ICompanyCartItem | null = await CompanyCartItem.findOne(
             {
