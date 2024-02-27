@@ -44,9 +44,9 @@ export const changeQuantityOfCart = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { _id } = (req as any).user;
         const productId = req.query.productId;
-        const change = req.query.change;
+        const changeTo = req.query.changeTo;
 
-        const cart: ICompanyCart | null = await CompanyCart.findOne({
+        const cart: ICompanyCart | null = await CompanyCart.findByIdAndUpdate({
             user_id: _id,
         })
             .where("is_bought")
@@ -61,21 +61,40 @@ export const changeQuantityOfCart = asyncHandler(
                 cart_id: cart?._id,
                 product_id: productId,
             }
-        );
+        ).populate("product");
 
-        if (change === "plus") {
-            await cartItem?.updateOne({
-                quantity: cartItem.quantity + 1,
-            });
-        } else {
-            if (cartItem?.quantity === 1) {
-                await cartItem.deleteOne();
-            } else {
-                await cartItem?.updateOne({
-                    quantity: cartItem.quantity - 1,
-                });
-            }
+        await cartItem?.updateOne({
+            quantity: changeTo,
+        });
+
+        if (!cartItem?.product) {
+            throw new MyError("Product not found", 400);
         }
+
+        let totalPrice =
+            cart.total_price +
+            cartItem?.product?.price * (cartItem?.quantity ?? 1) -
+            parseInt(changeTo as string);
+
+        if (
+            cartItem.product?.is_sale &&
+            cartItem.product?.sale_start_date &&
+            cartItem.product?.sale_end_date &&
+            new Date(cartItem.product?.sale_start_date) <= new Date() &&
+            new Date(cartItem.product?.sale_end_date) >= new Date()
+        ) {
+            totalPrice =
+                cart.total_price +
+                cartItem?.product?.sale_price *
+                    ((cartItem?.quantity ?? 1) - parseInt(changeTo as string));
+        }
+
+        await CompanyCart.findByIdAndUpdate(_id, {
+            total_quantity: cart.total_quantity + parseInt(changeTo as string),
+            total_price: totalPrice,
+        })
+            .where("is_bought")
+            .equals(false);
 
         res.status(200).json({
             success: true,

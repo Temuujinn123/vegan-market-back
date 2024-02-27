@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 export interface ICart extends mongoose.Document {
     user_id?: string;
     is_bought: boolean;
+    total_price: number;
+    total_quantity: number;
     created_at: Date;
 }
 

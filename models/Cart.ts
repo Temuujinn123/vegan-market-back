@@ -13,6 +13,16 @@ const CartSchema = new mongoose.Schema<ICart>(
             required: false,
             default: false,
         },
+        total_price: {
+            type: Number,
+            required: true,
+            default: 0,
+        },
+        total_quantity: {
+            type: Number,
+            required: true,
+            default: 0,
+        },
         created_at: {
             type: Date,
             default: Date.now(),
