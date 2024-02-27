@@ -49,7 +49,7 @@ const CompanyProductSchema = new mongoose.Schema<ICompanyProduct>(
         },
         category: {
             type: mongoose.Schema.ObjectId,
-            ref: "Category",
+            ref: "CompanyCategory",
             required: [true, "Insert category of the product..."],
         },
         created_at: {
