@@ -18,10 +18,16 @@ export const getCart = asyncHandler(
                 populate: {
                     path: "product",
                     model: "CompanyProduct",
-                    populate: {
-                        path: "img",
-                        model: "Files",
-                    },
+                    populate: [
+                        {
+                            path: "img",
+                            model: "Files",
+                        },
+                        {
+                            path: "category",
+                            model: "CompanyCategory",
+                        },
+                    ],
                 },
             })
             .where("is_bought")

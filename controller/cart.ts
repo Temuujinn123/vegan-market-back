@@ -4,6 +4,8 @@ import { ICart, ICartItem } from "../types/cart";
 import Cart from "../models/Cart";
 import CartItem from "../models/CartItem";
 import MyError from "../utils/myError";
+import { populate } from "dotenv";
+import path from "path";
 
 export const getCart = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -18,10 +20,16 @@ export const getCart = asyncHandler(
                 populate: {
                     path: "product",
                     model: "Product",
-                    populate: {
-                        path: "img",
-                        model: "Files",
-                    },
+                    populate: [
+                        {
+                            path: "img",
+                            model: "Files",
+                        },
+                        {
+                            path: "category",
+                            model: "Category",
+                        },
+                    ],
                 },
             })
             .where("is_bought")
