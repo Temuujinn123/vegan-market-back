@@ -47,7 +47,7 @@ export const changeQuantityOfCart = asyncHandler(
         const productId = req.query.productId;
         const changeTo = req.query.changeTo;
 
-        const cart: ICompanyCart | null = await CompanyCart.findByIdAndUpdate({
+        const cart: ICompanyCart | null = await CompanyCart.findOne({
             user_id: _id,
         })
             .where("is_bought")
