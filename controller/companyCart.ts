@@ -65,7 +65,7 @@ export const changeQuantityOfCart = asyncHandler(
         ).populate("product");
 
         await cartItem?.updateOne({
-            quantity: changeTo,
+            quantity: parseInt(changeTo as string),
         });
 
         if (!cartItem?.product) {
