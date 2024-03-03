@@ -9,7 +9,7 @@ import {
     updateProfile,
 } from "../controller/companyUser";
 import bodyparser from "body-parser";
-import { protect } from "../middleware/protect";
+import { companyProtect } from "../middleware/companyProtect";
 
 const companyUserRouter = express.Router();
 
@@ -17,7 +17,7 @@ const jsonParser = bodyparser.json();
 
 companyUserRouter
     .route("/")
-    .get(protect, getProfile)
+    .get(companyProtect, getProfile)
     .post(jsonParser, register);
 
 companyUserRouter.route("/forgetPassword").post(jsonParser, forgetPassword);
@@ -29,10 +29,10 @@ companyUserRouter.route("/login").post(jsonParser, login);
 
 companyUserRouter
     .route("/updateProfile")
-    .post(protect, jsonParser, updateProfile);
+    .post(companyProtect, jsonParser, updateProfile);
 
 companyUserRouter
     .route("/updatePassword")
-    .post(jsonParser, protect, changePassword);
+    .post(jsonParser, companyProtect, changePassword);
 
 export default companyUserRouter;

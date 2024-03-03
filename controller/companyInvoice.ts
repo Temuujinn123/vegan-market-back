@@ -7,6 +7,10 @@ import { ICompanyInvoice } from "../types/companyInvoice";
 import CompanyNotification from "../models/CompanyNotification";
 import { ICompanyCart } from "../types/companyCart";
 import CompanyCart from "../models/CompanyCart";
+import { generateRandomNumber } from "../utils/generateRandom";
+import { CourierClient } from "@trycourier/courier";
+import CompanyUser from "../models/CompanyUser";
+import { populate } from "dotenv";
 
 export const getInvoices = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -28,18 +32,27 @@ export const getInvoices = asyncHandler(
         const isPending: boolean | undefined = req.query.isPending
             ? Boolean(req.query.isPending)
             : undefined;
+        const isCancelled: boolean | undefined = req.query.isCancelled
+            ? Boolean(req.query.isCancelled)
+            : undefined;
+
+        console.log(req.query.isDelivered);
 
         ["page", "limit", "search", "startDate", "endDate"].forEach(
             (el) => delete req.query[el]
         );
 
-        const { _id } = (req as any).user;
-
         const filter: any = {};
 
         if (isPaid) filter.is_paid = isPaid;
         if (isDelivered) filter.is_delivered = isDelivered;
-        if (isPending) filter.is_paid = false;
+        if (isPending) {
+            filter.is_cancelled = false;
+            filter.is_delivered = false;
+        }
+        if (isCancelled) filter.is_cancelled = isCancelled;
+
+        console.log("---------------> ", isDelivered);
 
         const pagination = await Pagintate(
             page as number,
@@ -64,18 +77,14 @@ export const getInvoices = asyncHandler(
         //     filter.sender_invoice_no = { $regex: searchRegex };
         // }
 
-        if (_id) {
-            filter.user_id = _id;
+        if ((req as any).user) {
+            filter.user_id = (req as any).user._id;
         }
 
         const invoices: ICompanyInvoice[] = await CompanyInvoice.find(filter)
             .populate({
-                path: "cart_id",
+                path: "cart",
                 model: "CompanyCart",
-                populate: {
-                    path: "user_id",
-                    model: "CompanyUser",
-                },
             })
             .skip(pagination.start - 1)
             .limit(limit as number)
@@ -104,6 +113,10 @@ export const getInvoice = asyncHandler(
                     populate: {
                         path: "product",
                         model: "CompanyProduct",
+                        populate: {
+                            path: "img",
+                            model: "Files",
+                        },
                     },
                 },
             })
@@ -117,6 +130,10 @@ export const getInvoice = asyncHandler(
         });
     }
 );
+
+const courier = new CourierClient({
+    authorizationToken: "pk_prod_YKW6H56ARBMFXZK4BJ2VQ3K2R7NA",
+});
 
 export const updateInvoice = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -153,6 +170,21 @@ export const updateInvoice = asyncHandler(
                 user_id: invoice?.user_id,
                 url: "/profile/history",
                 content: "Таны захиалга амжилттай баталгаажлаа.",
+                type: "personal",
+            });
+
+            const user = await CompanyUser.findById(invoice?.user_id);
+
+            const { requestId } = await courier.send({
+                message: {
+                    to: {
+                        email: user?.email,
+                    },
+                    template: "A0N71XS8QAMJ85P4GGS16N5CV8A5",
+                    data: {
+                        recipientName: user?.company_name,
+                    },
+                },
             });
         }
 
@@ -213,8 +245,11 @@ export const createInvoice = asyncHandler(
 
         if (!cart) throw new MyError("Cart not found", 404);
 
+        const randomNumber = generateRandomNumber(6);
+
         const invoice: ICompanyInvoice = await CompanyInvoice.create({
             ...req.body,
+            sender_invoice_no: randomNumber.toString(),
             cart_id: cart._id,
             user_id: _id,
         });

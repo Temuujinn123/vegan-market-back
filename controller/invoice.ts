@@ -158,6 +158,7 @@ export const updateInvoice = asyncHandler(
                 user_id: invoice?.user_id,
                 url: "/profile/history",
                 content: "Таны захиалга амжилттай баталгаажлаа.",
+                type: "personal",
             });
         }
 

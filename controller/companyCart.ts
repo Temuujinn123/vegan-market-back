@@ -74,8 +74,8 @@ export const changeQuantityOfCart = asyncHandler(
 
         let totalPrice =
             cart.total_price +
-            cartItem?.product?.price * (cartItem?.quantity ?? 1) -
-            parseInt(changeTo as string);
+            cartItem?.product?.price *
+                (parseInt(changeTo as string) - (cartItem?.quantity ?? 1));
 
         if (
             cartItem.product?.is_sale &&
@@ -87,10 +87,12 @@ export const changeQuantityOfCart = asyncHandler(
             totalPrice =
                 cart.total_price +
                 cartItem?.product?.sale_price *
-                    ((cartItem?.quantity ?? 1) - parseInt(changeTo as string));
+                    (parseInt(changeTo as string) - (cartItem?.quantity ?? 1));
         }
 
-        await CompanyCart.findByIdAndUpdate(_id, {
+        console.log(totalPrice);
+
+        await CompanyCart.findByIdAndUpdate(cart._id, {
             total_quantity: cart.total_quantity + parseInt(changeTo as string),
             total_price: totalPrice,
         })
