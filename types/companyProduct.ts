@@ -13,6 +13,7 @@ export interface PaginationDto {
 export interface ICompanyProduct extends mongoose.Document {
     name: string;
     img: string;
+    bar_code: number;
     price: number;
     storage_duration: number;
     stock: number;

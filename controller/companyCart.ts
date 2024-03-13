@@ -64,6 +64,8 @@ export const changeQuantityOfCart = asyncHandler(
             }
         ).populate("product");
 
+        const quantityBeforeChange: number = cartItem?.quantity ?? 0;
+
         await cartItem?.updateOne({
             quantity: parseInt(changeTo as string),
         });
@@ -93,7 +95,9 @@ export const changeQuantityOfCart = asyncHandler(
         console.log(totalPrice);
 
         await CompanyCart.findByIdAndUpdate(cart._id, {
-            total_quantity: cart.total_quantity + parseInt(changeTo as string),
+            total_quantity:
+                cart.total_quantity +
+                (parseInt(changeTo as string) - quantityBeforeChange),
             total_price: totalPrice,
         })
             .where("is_bought")
@@ -192,6 +196,42 @@ export const deleteCart = asyncHandler(
         })
             .where("is_bought")
             .equals(false);
+
+        if (!cart) {
+            throw new MyError("Cart not found", 400);
+        }
+
+        const cartItem = await CompanyCartItem.findOne({
+            cart_id: cart?._id,
+            product_id: productId,
+        }).populate("product");
+
+        if (!cartItem) {
+            throw new MyError("Cart item not found", 400);
+        }
+
+        let isSale = false;
+
+        if (
+            cartItem.product?.is_sale &&
+            cartItem.product?.sale_start_date &&
+            cartItem.product?.sale_end_date &&
+            new Date(cartItem.product?.sale_start_date) <= new Date() &&
+            new Date(cartItem.product?.sale_end_date) >= new Date()
+        )
+            isSale = true;
+
+        console.log("=============> ", cartItem.quantity);
+
+        await CompanyCart.findByIdAndUpdate(cart?._id, {
+            total_quantity: cart.total_quantity - cartItem.quantity,
+            total_price:
+                cart.total_price -
+                cartItem.quantity *
+                    (isSale
+                        ? cartItem.product?.sale_price ?? 0
+                        : cartItem.product?.price ?? 0),
+        });
 
         const result = await CompanyCartItem.deleteOne({
             cart_id: cart?._id,

@@ -10,7 +10,6 @@ import CompanyCart from "../models/CompanyCart";
 import { generateRandomNumber } from "../utils/generateRandom";
 import { CourierClient } from "@trycourier/courier";
 import CompanyUser from "../models/CompanyUser";
-import { populate } from "dotenv";
 
 export const getInvoices = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {

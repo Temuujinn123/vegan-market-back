@@ -17,27 +17,17 @@ const CompanyUserSchema = new mongoose.Schema<ICompanyUser>({
             "Email is incorrect",
         ],
     },
+    company_code: {
+        type: Number,
+        length: 7,
+        required: true,
+    },
     phone_number: {
         type: Number,
         required: [false, "Please insert your phone number."],
         default: null,
     },
-    city: {
-        type: String,
-        required: false,
-        default: null,
-    },
-    district: {
-        type: String,
-        required: false,
-        default: null,
-    },
-    committ: {
-        type: String,
-        required: false,
-        default: null,
-    },
-    address_detail: {
+    address: {
         type: String,
         required: false,
         default: null,

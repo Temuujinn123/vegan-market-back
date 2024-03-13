@@ -7,10 +7,20 @@ import asyncHandler from "../middleware/asyncHandler";
 import Cart from "../models/Cart";
 import { ICompanyUser } from "../types/companyUser";
 import CompanyUser from "../models/CompanyUser";
+import { generateRandomNumber } from "../utils/generateRandom";
 
 export const register = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const user: ICompanyUser = await CompanyUser.create(req.body);
+        let { company_code }: { company_code: string | null } = req.body;
+
+        if (company_code === null) {
+            company_code = generateRandomNumber(7);
+        }
+
+        const user: ICompanyUser = await CompanyUser.create({
+            ...req.body,
+            company_code: parseInt(company_code),
+        });
 
         const token: string = (user as any).getJsonWebToken();
 

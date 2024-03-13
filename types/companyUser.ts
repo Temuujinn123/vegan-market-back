@@ -3,11 +3,9 @@ import mongoose from "mongoose";
 export interface ICompanyUser extends mongoose.Document {
     company_name: string;
     email: string;
+    company_code: number;
     phone_number: number;
-    city: string | null;
-    district: string | null;
-    committ: string | null;
-    address_detail: string | null;
+    address: string | null;
     password: string;
     resetPasswordToken: string;
     resetPasswordExpire: Date;
