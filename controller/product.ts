@@ -83,9 +83,7 @@ export const getCategoryProducts = asyncHandler(
             .populate(["category", "img", "sub_category"])
             .sort(sort as string)
             .skip(pagination.start - 1)
-            .limit(limit as number)
-            .where("is_deleted")
-            .equals(false);
+            .limit(limit as number);
 
         res.status(200).json({
             success: true,
