@@ -35,8 +35,6 @@ export const getInvoices = asyncHandler(
             ? Boolean(req.query.isCancelled)
             : undefined;
 
-        console.log(req.query.isDelivered);
-
         ["page", "limit", "search", "startDate", "endDate"].forEach(
             (el) => delete req.query[el]
         );
@@ -50,8 +48,6 @@ export const getInvoices = asyncHandler(
             filter.is_delivered = false;
         }
         if (isCancelled) filter.is_cancelled = isCancelled;
-
-        console.log("---------------> ", isDelivered);
 
         const pagination = await Pagintate(
             page as number,

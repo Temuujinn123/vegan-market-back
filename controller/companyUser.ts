@@ -84,17 +84,11 @@ export const updateProfile = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { _id } = (req as any).user;
         const {
-            address_detail,
-            city,
-            committ,
-            district,
+            address,
             name,
             phone_number,
         }: {
-            address_detail: string;
-            city: string;
-            committ: string;
-            district: string;
+            address: string;
             name: string;
             phone_number: number;
         } = req.body;
@@ -105,10 +99,7 @@ export const updateProfile = asyncHandler(
 
         const user: ICompanyUser | null | undefined =
             await CompanyUser.findByIdAndUpdate(_id, {
-                address_detail,
-                city,
-                committ,
-                district,
+                address,
                 name,
                 phone_number,
             });

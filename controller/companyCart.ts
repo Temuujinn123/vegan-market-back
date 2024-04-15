@@ -92,8 +92,6 @@ export const changeQuantityOfCart = asyncHandler(
                     (parseInt(changeTo as string) - (cartItem?.quantity ?? 1));
         }
 
-        console.log(totalPrice);
-
         await CompanyCart.findByIdAndUpdate(cart._id, {
             total_quantity:
                 cart.total_quantity +
@@ -220,8 +218,6 @@ export const deleteCart = asyncHandler(
             new Date(cartItem.product?.sale_end_date) >= new Date()
         )
             isSale = true;
-
-        console.log("=============> ", cartItem.quantity);
 
         await CompanyCart.findByIdAndUpdate(cart?._id, {
             total_quantity: cart.total_quantity - cartItem.quantity,

@@ -228,10 +228,8 @@ export const checkChangePasswordCodeAndChangePassword = asyncHandler(
 export const sendSMSToPhone = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { phoneNumber }: { phoneNumber: number } = req.body;
-        console.log("🚀 ~ file: user.ts:228 ~ phoneNumber:", phoneNumber);
 
         const result = await sendSMS(phoneNumber);
-        console.log("🚀 ~ file: user.ts:230 ~ result:", result);
     }
 );
 

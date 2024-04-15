@@ -245,8 +245,6 @@ export const uploadProductPhoto = asyncHandler(
 
         const files = req.files?.file;
 
-        console.log(files);
-
         if (!files) throw new MyError("Please upload file...", 400);
 
         if (Array.isArray(files)) {
@@ -294,7 +292,6 @@ export const uploadProductPhoto = asyncHandler(
             if (err) throw new MyError(err.message, 400);
 
             const result = await uploadImageToCloudinary(files.name);
-            console.log("🚀 ~ result:", result);
 
             await Files.create({
                 name: files.name,

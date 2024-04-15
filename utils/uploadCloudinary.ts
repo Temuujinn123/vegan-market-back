@@ -12,10 +12,6 @@ const uploadImageToCloudinary = async (fileName: string) => {
                     console.error("Error uploading file:", error);
                     throw error;
                 }
-                console.log(
-                    "File uploaded successfully. URL:",
-                    result.secure_url
-                );
                 // Return or use result.secure_url as the URL of the uploaded file
             }
         );
