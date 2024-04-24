@@ -111,7 +111,8 @@ export const changeQuantityOfCart = asyncHandler(
 export const createCart = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { _id } = (req as any).user;
-        const { productId } = req.body;
+        const { productId, quantity }: { productId: string; quantity: number } =
+            req.body;
 
         const product = await CompanyProduct.findById(productId);
 
@@ -128,7 +129,7 @@ export const createCart = asyncHandler(
         if (!cart) {
             cart = await CompanyCart.create({
                 user_id: _id,
-                total_quantity: 1,
+                total_quantity: quantity,
                 total_price: product.is_sale
                     ? product.sale_start_date &&
                       product.sale_end_date &&
