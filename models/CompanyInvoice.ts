@@ -13,6 +13,11 @@ const CompanyInvoiceSchema = new mongoose.Schema<ICompanyInvoice>(
             ref: "CompanyCart",
             required: true,
         },
+        invoice_no: {
+            type: Number,
+            unique: true,
+            default: 1,
+        },
         sender_invoice_no: {
             type: String,
             required: true,

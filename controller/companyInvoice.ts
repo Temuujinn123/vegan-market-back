@@ -242,11 +242,14 @@ export const createInvoice = asyncHandler(
 
         const randomNumber = generateRandomNumber(6);
 
+        const countOfInvoice = await CompanyInvoice.countDocuments();
+
         const invoice: ICompanyInvoice = await CompanyInvoice.create({
             ...req.body,
             sender_invoice_no: randomNumber.toString(),
             cart_id: cart._id,
             user_id: _id,
+            invoice_no: countOfInvoice ?? 1,
         });
 
         await CompanyCart.findByIdAndUpdate(invoice.cart_id, {

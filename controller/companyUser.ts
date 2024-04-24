@@ -220,7 +220,8 @@ export const checkChangePasswordCodeAndChangePassword = asyncHandler(
                 success: true,
             });
         } else {
-            throw new Error("Code is wrong");
+            console.log("=========>");
+            throw new MyError("Нууц үг солих код буруу байна.", 400);
         }
     }
 );

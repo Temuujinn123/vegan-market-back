@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import path from "path";
 
 const connectDB = async () => {
     const mongodb_uri =
