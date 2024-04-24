@@ -220,7 +220,7 @@ export const checkChangePasswordCodeAndChangePassword = asyncHandler(
                 success: true,
             });
         } else {
-            throw new MyError("Code is wrong", 400);
+            throw new Error("Code is wrong");
         }
     }
 );
