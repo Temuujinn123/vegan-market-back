@@ -10,7 +10,7 @@ const CompanyUserSchema = new mongoose.Schema<ICompanyUser>({
     },
     email: {
         type: String,
-        required: [true, "Please insert your email."],
+        required: false,
         unique: true,
         match: [
             /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
@@ -24,7 +24,7 @@ const CompanyUserSchema = new mongoose.Schema<ICompanyUser>({
     },
     phone_number: {
         type: Number,
-        required: [false, "Please insert your phone number."],
+        required: [true, "Please insert your phone number."],
         default: null,
     },
     address: {
@@ -56,11 +56,6 @@ const CompanyUserSchema = new mongoose.Schema<ICompanyUser>({
     },
 });
 
-CompanyUserSchema.pre("save", async function () {
-    const salt: string = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-});
-
 CompanyUserSchema.methods.getJsonWebToken = function () {
     const token: string = jwt.sign(
         { id: this._id },
@@ -76,7 +71,7 @@ CompanyUserSchema.methods.getJsonWebToken = function () {
 CompanyUserSchema.methods.checkPassword = async function (
     enteredPassword: string
 ) {
-    return await bcrypt.compare(enteredPassword, this.password);
+    return enteredPassword === this.password;
 };
 
 export default mongoose.model("CompanyUser", CompanyUserSchema);

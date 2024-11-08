@@ -1,15 +1,17 @@
 import express from "express";
 import {
-    changePassword,
-    checkChangePasswordCodeAndChangePassword,
-    forgetPassword,
+    deleteUser,
     getProfile,
+    getUser,
+    getUsers,
     login,
     register,
     updateProfile,
+    updateUser,
 } from "../controller/companyUser";
 import bodyparser from "body-parser";
 import { companyProtect } from "../middleware/companyProtect";
+import { adminProtect } from "../middleware/adminProtect";
 
 const companyUserRouter = express.Router();
 
@@ -17,22 +19,21 @@ const jsonParser = bodyparser.json();
 
 companyUserRouter
     .route("/")
-    .get(companyProtect, getProfile)
-    .post(jsonParser, register);
+    .get(adminProtect, getUsers)
+    .post(adminProtect, jsonParser, register);
 
-companyUserRouter.route("/forgetPassword").post(jsonParser, forgetPassword);
 companyUserRouter
-    .route("/changePassword")
-    .post(jsonParser, checkChangePasswordCodeAndChangePassword);
+    .route("/:id")
+    .get(adminProtect, getUser)
+    .delete(adminProtect, deleteUser)
+    .put(adminProtect, jsonParser, updateUser);
 
 companyUserRouter.route("/login").post(jsonParser, login);
+
+companyUserRouter.route("/getProfile").get(companyProtect, getProfile);
 
 companyUserRouter
     .route("/updateProfile")
     .post(companyProtect, jsonParser, updateProfile);
-
-companyUserRouter
-    .route("/updatePassword")
-    .post(jsonParser, companyProtect, changePassword);
 
 export default companyUserRouter;
