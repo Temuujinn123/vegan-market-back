@@ -188,6 +188,7 @@ export const deleteUser = asyncHandler(
 export const getUser = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const user = await CompanyUser.findById(req.params.id).select([
+            "login_name",
             "company_name",
             "company_code",
             "email",
