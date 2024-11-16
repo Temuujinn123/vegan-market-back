@@ -80,17 +80,17 @@ export const register = asyncHandler(
 
 export const login = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const { companyName, password } = req.body;
+        const { loginName, password } = req.body;
 
-        if (!companyName || !password) {
+        if (!loginName || !password) {
             throw new MyError(
-                "Please insert your company name and password.",
+                "Please insert your company login name and password.",
                 400
             );
         }
 
         const user: ICompanyUser = await CompanyUser.findOne({
-            company_name: companyName,
+            login_name: loginName,
         }).select("+password");
 
         if (!user) {

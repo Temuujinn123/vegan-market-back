@@ -4,6 +4,10 @@ import jwt from "jsonwebtoken";
 import { ICompanyUser } from "../types/companyUser";
 
 const CompanyUserSchema = new mongoose.Schema<ICompanyUser>({
+    login_name: {
+        type: String,
+        required: [true, "Please insert login name of company user."],
+    },
     company_name: {
         type: String,
         required: [true, "Please insert your company name."],
