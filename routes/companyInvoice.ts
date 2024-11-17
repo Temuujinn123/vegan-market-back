@@ -3,6 +3,7 @@ import bodyparser from "body-parser";
 import {
     confirmInvoicePayment,
     createInvoice,
+    createInvoioceExcel,
     getInvoice,
     getInvoices,
     updateInvoice,
@@ -26,5 +27,9 @@ companyInvoiceRouter
     .post(jsonParser, companyProtect, createInvoice);
 
 companyInvoiceRouter.route("/payment").get(jsonParser, confirmInvoicePayment);
+
+companyInvoiceRouter
+    .route("/getExcel/:id")
+    .get(jsonParser, createInvoioceExcel);
 
 export default companyInvoiceRouter;
