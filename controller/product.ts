@@ -11,8 +11,6 @@ import Files from "../models/Files";
 import uploadImageToCloudinary from "../utils/uploadCloudinary";
 import Noitfication from "../models/Noitfication";
 import SubCategory from "../models/SubCategory";
-import jwt from "jsonwebtoken";
-import AdminUser from "../models/AdminUser";
 
 export const getCategoryProducts = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -296,9 +294,8 @@ export const uploadProductPhoto = asyncHandler(
                     file.size > +process.env.MAX_UPLOAD_FILE_SIZE
                 )
                     throw new MyError("Your image's size is too big...", 400);
-                file.name = `photo_${req.params.id}${new Date().getTime()}${
-                    path.parse(file.name).ext
-                }`;
+                file.name = `photo_${req.params.id}${new Date().getTime()}${path.parse(file.name).ext
+                    }`;
                 file.mv(
                     `${process.env.FILE_UPLOAD_PATH}/${file.name}`,
                     async (err: Error) => {
@@ -323,9 +320,8 @@ export const uploadProductPhoto = asyncHandler(
         if (!files.mimetype?.startsWith("image"))
             throw new MyError("Please upload image file...", 400);
 
-        files.name = `photo_${req.params.id}${new Date().getTime()}${
-            path.parse(files.name).ext
-        }`;
+        files.name = `photo_${req.params.id}${new Date().getTime()}${path.parse(files.name).ext
+            }`;
 
         files.mv(`./public/upload/${files.name}`, async (err: Error) => {
             console.log("=========> ", err);
