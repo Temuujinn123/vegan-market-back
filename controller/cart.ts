@@ -114,7 +114,7 @@ export const createCart = asyncHandler(
         const newCartItem: ICartItem = await CartItem.create({
             cart_id: cart?._id,
             product_id: productId,
-            quantity: quantity,
+            quantity: +quantity,
         });
 
         res.status(200).json({
