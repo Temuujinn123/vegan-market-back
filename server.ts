@@ -48,7 +48,8 @@ app.use(
             "https://vegan-market-front.vercel.app",
             "https://www.e-veganmarket.com",
             "https://e-veganmarket.com",
-            "http://localhost:8082",
+            "http://localhost:8081",
+            "http://192.168.1.20:8081",
         ],
         optionsSuccessStatus: 200,
     })

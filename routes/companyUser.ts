@@ -30,7 +30,7 @@ companyUserRouter
 
 companyUserRouter.route("/login").post(jsonParser, login);
 
-companyUserRouter.route("/getProfile").get(companyProtect, getProfile);
+companyUserRouter.route("/user/getProfile").get(companyProtect, getProfile);
 
 companyUserRouter
     .route("/updateProfile")
