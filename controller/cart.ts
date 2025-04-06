@@ -87,7 +87,7 @@ export const changeQuantityOfCart = asyncHandler(
 export const createCart = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
         const { _id } = (req as any).user;
-        const { productId } = req.body;
+        const { productId, quantity } = req.body;
 
         const cart: ICart | null = await Cart.findOne({
             user_id: _id,
@@ -114,6 +114,7 @@ export const createCart = asyncHandler(
         const newCartItem: ICartItem = await CartItem.create({
             cart_id: cart?._id,
             product_id: productId,
+            quantity: +quantity,
         });
 
         res.status(200).json({
