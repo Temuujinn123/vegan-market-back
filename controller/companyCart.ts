@@ -126,32 +126,29 @@ export const createCart = asyncHandler(
             .where("is_bought")
             .equals(false);
 
+        let productPrice = product.price * (quantity ? quantity : 1);
+
+        if (product.is_sale) {
+            if (
+                product.sale_start_date &&
+                product.sale_end_date &&
+                new Date(product.sale_start_date) >= new Date() &&
+                new Date(product.sale_end_date) <= new Date()
+            ) {
+                productPrice = product.sale_price * quantity;
+            }
+        }
+
         if (!cart) {
             cart = await CompanyCart.create({
                 user_id: _id,
                 total_quantity: quantity,
-                total_price: product.is_sale
-                    ? product.sale_start_date &&
-                      product.sale_end_date &&
-                      new Date(product.sale_start_date) >= new Date() &&
-                      new Date(product.sale_end_date) <= new Date()
-                        ? product.sale_price
-                        : product.price
-                    : product.price,
+                total_price: productPrice,
             });
         } else {
             await CompanyCart.findByIdAndUpdate(cart._id, {
                 total_quantity: cart.total_quantity + 1,
-                total_price:
-                    cart.total_price +
-                    (product.is_sale
-                        ? product.sale_start_date &&
-                          product.sale_end_date &&
-                          new Date(product.sale_start_date) >= new Date() &&
-                          new Date(product.sale_end_date) <= new Date()
-                            ? product.sale_price
-                            : product.price
-                        : product.price),
+                total_price: cart.total_price + productPrice,
             });
         }
 
@@ -175,6 +172,7 @@ export const createCart = asyncHandler(
 
         const newCartItem: ICompanyCartItem = await CompanyCartItem.create({
             cart_id: cart?._id,
+            quantity,
             product_id: productId,
         });
 
